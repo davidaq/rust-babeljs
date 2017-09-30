@@ -1,5 +1,6 @@
 use util::Queue;
 use syntax::tokenize::*;
+use self::input_reader::InputReader;
 
 pub struct Tokenizer<'a> {
   parse_pos: usize,
@@ -8,6 +9,7 @@ pub struct Tokenizer<'a> {
   updated: bool,
   input: &'a Queue<String>,
   output: &'a Queue<Token>,
+  reader: InputReader<'a>,
   source: String,
 }
 
@@ -20,6 +22,7 @@ impl<'a> Tokenizer<'a> {
       updated: false,
       input: input,
       output: output,
+      reader: InputReader::new(input),
       source: String::from(""),
     };
     return inst;
