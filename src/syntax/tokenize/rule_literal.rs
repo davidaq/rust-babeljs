@@ -1,7 +1,6 @@
-use util::MaybeOption;
 use syntax::tokenize::token_type;
 
-pub fn string (source: &str, ended: bool) -> MaybeOption<( u16, u32, usize, Option<String> )> {
+pub fn string (source: &str) -> Option<( u16, u32, usize )> {
   let mut chars = source.chars();
   match chars.next() {
     Some(start_char) => {
@@ -34,27 +33,50 @@ pub fn string (source: &str, ended: bool) -> MaybeOption<( u16, u32, usize, Opti
               }
             }
           }
-          if len == 0 {
-            MaybeOption::None
-          } else if maybe {
-            MaybeOption::Maybe
+          if len > 0 {
+            Option::Some(( token_type::StringLiteral, 0, len ))
           } else {
-            MaybeOption::Some(( token_type::StringLiteral, 0, len, Option::Some(String::from(&source[0..len])) ))
+            Option::None
           }
         },
-        _ => MaybeOption::None,
+        _ => Option::None,
       }
     },
-    None => MaybeOption::None,
+    None => Option::None,
   }
 }
 
-pub fn number (source: &str, ended: bool) -> MaybeOption<( u16, u32, usize, Option<String> )> {
+pub fn number (source: &str) -> Option<( u16, u32, usize )> {
+  let len = numberAsLen(source);
+  if len > 0 {
+    Option::Some(( token_type::NumericLiteral, 0, len ))
+  } else {
+    Option::None
+  }
+}
+
+fn numberAsLen (source: &str) -> usize {
   let mut chars = source.chars();
   match chars.next() {
-    Some (c) {
-
+    Some (c) => {
+      match c {
+        '0' => {
+          match chars.next() {
+            Some (c) => {
+              1
+            },
+            None => 1,
+          }
+        },
+        '.' => {
+          1
+        },
+        '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' => {
+          1
+        },
+        _ => 0,
+      }
     },
-    None => MaybeOption::None,
+    None => 0,
   }
 }

@@ -1,5 +1,4 @@
 use util::Queue;
-use util::MaybeOption;
 use syntax::tokenize::*;
 
 pub struct Tokenizer<'a> {
@@ -54,21 +53,19 @@ impl<'a> Tokenizer<'a> {
       let mut token_type : u16 = token_type::Unexpected;
       let mut flag : u32 = 0;
       let mut len : usize = 0;
-      let mut content : Option<String> = Option::None;
+      let mut maybe = false;
 
       macro_rules! match_token_rule {
         ( $rule:path ) => {
-          let mut maybe = false;
-          match $rule (&self.source[self.parse_pos..], self.ended) {
-            MaybeOption::None => {},
-            MaybeOption::Maybe => {
-              maybe = true;
-            },
-            MaybeOption::Some (result) => {
+          match $rule (&self.source[self.parse_pos..]) {
+            None => {},
+            Some (result) => {
               token_type = result.0;
               flag = result.1;
               len = result.2;
-              content = result.3;
+              if len + self.parse_pos >= self.source.len() {
+                maybe = true;
+              }
             },
           }
           if maybe {
@@ -102,7 +99,11 @@ impl<'a> Tokenizer<'a> {
         flag: flag,
         start: self.parse_pos,
         end: end,
-        content: content,
+        content: if token_type::CopySource & token_type > 0 {
+          Option::Some(String::from(&self.source[self.parse_pos..end]))
+        } else {
+          Option::None
+        },
       });
       self.parse_pos += len;
     }

@@ -15,7 +15,7 @@ fn main() {
         scope.spawn(|| {
             tokenizer.run();
         });
-        source_queue.push(String::from("if (1 + 1> 2) {"));
+        source_queue.push(String::from(" if (1 + 1> 2) {"));
         source_queue.push(String::from("alert ('hello world');"));
         source_queue.push(String::from("} else if{}"));
         source_queue.end();
@@ -27,7 +27,7 @@ fn main() {
                         _ => {
                             match token.content {
                                 Some (content) => {
-                                    println!("token: {} content: {}", token.token_type, content);
+                                    println!("token: {} content: {}", token.token_type - token_type::CopySource, content);
                                 },
                                 None => {
                                     println!("token: {}", token.token_type);

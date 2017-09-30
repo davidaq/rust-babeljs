@@ -1,10 +1,8 @@
-use util::MaybeOption;
 use syntax::tokenize::token_type;
 
-pub fn all (source: &str, ended: bool) -> MaybeOption<( u16, u32, usize, Option<String> )> {
+pub fn all (source: &str) -> Option<( u16, u32, usize )> {
   let mut chars = source.chars();
   let mut len = 0;
-  let mut maybe = false;
   match chars.next() {
     Some(c) => {
       match c {
@@ -28,9 +26,6 @@ pub fn all (source: &str, ended: bool) -> MaybeOption<( u16, u32, usize, Option<
                 }
               },
               None => {
-                if ended {
-                  maybe = true;
-                }
                 nomore = true;
               },
             }
@@ -41,9 +36,7 @@ pub fn all (source: &str, ended: bool) -> MaybeOption<( u16, u32, usize, Option<
     },
     None => {},
   };
-  if maybe {
-    return MaybeOption::Maybe;
-  } else if len > 0 {
+  if len > 0 {
     let content = &source[0..len] as &str;
     let (token_type, flag) = match content {
       "true" => (token_type::BooleanLiteral, 1),
@@ -72,12 +65,8 @@ pub fn all (source: &str, ended: bool) -> MaybeOption<( u16, u32, usize, Option<
       "null" => (token_type::Null, 0),
       _ => (token_type::Identifier, 0),
     };
-    if token_type == token_type::Identifier {
-      return MaybeOption::Some((token_type, flag, len, Option::Some(String::from(content))));
-    } else {
-      return MaybeOption::Some((token_type, flag, len, Option::None));
-    }
+    Option::Some(( token_type, flag, len ))
   } else {
-    return MaybeOption::None;
+    return Option::None
   }
 }

@@ -9,8 +9,10 @@ pub struct Token {
 }
 
 pub mod token_type {
+  pub const CopySource           : u16 = 0b1000000000000000;
+
   // Space, Tab and Line Breaks
-  pub const WhiteSpace            : u16 = 0;
+  pub const WhiteSpace            : u16 = 0 | CopySource;
 
   // Seperation
   pub const Colon                 : u16 = 1;
@@ -18,8 +20,8 @@ pub mod token_type {
   pub const Comma                 : u16 = 3;
 
   // Comment
-  pub const LineComment           : u16 = 4;
-  pub const BlockComment          : u16 = 5;
+  pub const LineComment           : u16 = 4 | CopySource;
+  pub const BlockComment          : u16 = 5 | CopySource;
 
   // Scope Wrapping
   pub const Parenthesis           : u16 = 10;
@@ -27,11 +29,11 @@ pub mod token_type {
   pub const Brace                 : u16 = 12;
 
   // Values
-  pub const Identifier            : u16 = 20;
-  pub const NumericLiteral        : u16 = 21;
+  pub const Identifier            : u16 = 20 | CopySource;
+  pub const NumericLiteral        : u16 = 21 | CopySource;
   pub const BooleanLiteral        : u16 = 22;
-  pub const StringLiteral         : u16 = 23;
-  pub const TemplateStringChunk   : u16 = 24;
+  pub const StringLiteral         : u16 = 23 | CopySource;
+  pub const TemplateStringChunk   : u16 = 24 | CopySource;
 
   // Operation
   pub const Arrow                 : u16 = 30;
