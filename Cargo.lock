@@ -1,0 +1,21 @@
+[root]
+name = "rust-babeljs"
+version = "0.1.0"
+dependencies = [
+ "crossbeam 0.3.0 (git+https://github.com/crossbeam-rs/crossbeam?tag=0.3.0)",
+ "std-semaphore 0.1.0 (git+https://github.com/invenia/std-semaphore?rev=e3fc0de)",
+]
+
+[[package]]
+name = "crossbeam"
+version = "0.3.0"
+source = "git+https://github.com/crossbeam-rs/crossbeam?tag=0.3.0#cb9dca913a5e2f083e765b8e344212743e1a42ac"
+
+[[package]]
+name = "std-semaphore"
+version = "0.1.0"
+source = "git+https://github.com/invenia/std-semaphore?rev=e3fc0de#e3fc0de6716307a486ed2d3e2ae20bd57d74d045"
+
+[metadata]
+"checksum crossbeam 0.3.0 (git+https://github.com/crossbeam-rs/crossbeam?tag=0.3.0)" = "<none>"
+"checksum std-semaphore 0.1.0 (git+https://github.com/invenia/std-semaphore?rev=e3fc0de)" = "<none>"
