@@ -10,10 +10,9 @@ use util::Queue;
 fn main() {
     let source_queue = Queue::<String>::new();
     let token_queue = Queue::<Token>::new();
-    let mut tokenizer = Tokenizer::new(&source_queue, &token_queue);
     crossbeam::scope(|scope| {
         scope.spawn(|| {
-            tokenizer.run();
+            Tokenizer::new(&source_queue, &token_queue).run();
         });
         source_queue.push(String::from(" if (1 + 1> 2) {"));
         source_queue.push(String::from("alert ('hello world');"));
@@ -23,11 +22,11 @@ fn main() {
             match token_queue.pop() {
                 Some(token) => {
                     match token.token_type {
-                        token_type::Unexpected => println!("Unexpected"),
+                        token_type::UNEXPECTED => println!("Unexpected"),
                         _ => {
                             match token.content {
                                 Some (content) => {
-                                    println!("token: {} content: {}", token.token_type - token_type::CopySource, content);
+                                    println!("token: {} content: {}", token.token_type - token_type::COPY_SOURCE, content);
                                 },
                                 None => {
                                     println!("token: {}", token.token_type);

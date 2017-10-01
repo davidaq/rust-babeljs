@@ -1,71 +1,60 @@
 use syntax::tokenize::token_type;
+use syntax::tokenize::input_reader::InputReader;
 
-pub fn all (source: &str) -> Option<( u16, u32, usize )> {
-  let mut chars = source.chars();
+pub fn all (reader: &mut InputReader) -> Option<( u16, u32, usize )> {
   let mut len = 0;
-  match chars.next() {
-    Some(c) => {
-      match c {
-        'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j' | 'k' | 'l' | 'm' |
-        'n' | 'o' | 'p' | 'q' | 'r' | 's' | 't' | 'u' | 'v' | 'w' | 'x' | 'y' | 'z' |
-        '$' | '_' => {
-          let mut nomore = false;
-          len = 1;
-          while !nomore {
-            match chars.next() {
-              Some(c) => {
-                match c {
-                  'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j' | 'k' | 'l' | 'm' |
-                  'n' | 'o' | 'p' | 'q' | 'r' | 's' | 't' | 'u' | 'v' | 'w' | 'x' | 'y' | 'z' |
-                  '$' | '_' | '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' => {
-                    len += 1;
-                  },
-                  _ => {
-                    nomore = true;
-                  },
-                }
-              },
-              None => {
-                nomore = true;
-              },
-            }
-          }
-        },
-        _ => {},
+  match reader.next() {
+    'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j' | 'k' | 'l' | 'm' |
+    'n' | 'o' | 'p' | 'q' | 'r' | 's' | 't' | 'u' | 'v' | 'w' | 'x' | 'y' | 'z' |
+    '$' | '_' => {
+      len = 1;
+      loop {
+        match reader.next() {
+          'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j' | 'k' | 'l' | 'm' |
+          'n' | 'o' | 'p' | 'q' | 'r' | 's' | 't' | 'u' | 'v' | 'w' | 'x' | 'y' | 'z' |
+          '$' | '_' | '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' => {
+            len += 1;
+          },
+          _ => {
+            break;
+          },
+        };
       }
     },
-    None => {},
+    _ => {},
   };
   if len > 0 {
-    let content = &source[0..len] as &str;
-    let (token_type, flag) = match content {
-      "true" => (token_type::BooleanLiteral, 1),
-      "false" => (token_type::BooleanLiteral, 0),
-      "function" => (token_type::Function, 0),
-      "return" => (token_type::Return, 0),
-      "async" => (token_type::Async, 0),
-      "await" => (token_type::Await, 0),
-      "throw" => (token_type::Throw, 0),
-      "yield" => (token_type::Yield, 0),
-      "class" => (token_type::Class, 0),
-      "extends" => (token_type::Extends, 0),
-      "if" => (token_type::If, 0),
-      "else" => (token_type::Else, 0),
-      "while" => (token_type::While, 0),
-      "for" => (token_type::For, 0),
-      "break" => (token_type::Break, 0),
-      "continue" => (token_type::Continue, 0),
-      "in" => (token_type::In, 0),
-      "of" => (token_type::Of, 0),
-      "try" => (token_type::Try, 0),
-      "catch" => (token_type::Catch, 0),
-      "var" => (token_type::Var, 0),
-      "let" => (token_type::Let, 0),
-      "const" => (token_type::Const, 0),
-      "null" => (token_type::Null, 0),
-      _ => (token_type::Identifier, 0),
+    let (token_type, flag) = match reader.content(len) {
+      "true"      => (token_type::BOOLEAN_LITERAL, token_type::boolean::TRUE),
+      "false"     => (token_type::BOOLEAN_LITERAL, token_type::boolean::FALSE),
+
+      "function"  => (token_type::KEYWORD, token_type::keyword::FUNCTION),
+      "return"    => (token_type::KEYWORD, token_type::keyword::RETURN),
+      "async"     => (token_type::KEYWORD, token_type::keyword::ASYNC),
+      "await"     => (token_type::KEYWORD, token_type::keyword::AWAIT),
+      "throw"     => (token_type::KEYWORD, token_type::keyword::THROW),
+      "yield"     => (token_type::KEYWORD, token_type::keyword::YIELD),
+      "class"     => (token_type::KEYWORD, token_type::keyword::CLASS),
+      "extends"   => (token_type::KEYWORD, token_type::keyword::EXTENDS),
+      "static"    => (token_type::KEYWORD, token_type::keyword::STATIC),
+      "if"        => (token_type::KEYWORD, token_type::keyword::IF),
+      "else"      => (token_type::KEYWORD, token_type::keyword::ELSE),
+      "while"     => (token_type::KEYWORD, token_type::keyword::WHILE),
+      "for"       => (token_type::KEYWORD, token_type::keyword::FOR),
+      "break"     => (token_type::KEYWORD, token_type::keyword::BREAK),
+      "continue"  => (token_type::KEYWORD, token_type::keyword::CONTINUE),
+      "continue"  => (token_type::KEYWORD, token_type::keyword::DO),
+      "var"       => (token_type::KEYWORD, token_type::keyword::VAR),
+      "let"       => (token_type::KEYWORD, token_type::keyword::LET),
+      "const"     => (token_type::KEYWORD, token_type::keyword::CONST),
+      "in"        => (token_type::KEYWORD, token_type::keyword::IN),
+      "of"        => (token_type::KEYWORD, token_type::keyword::OF),
+      "try"       => (token_type::KEYWORD, token_type::keyword::TRY),
+      "catch"     => (token_type::KEYWORD, token_type::keyword::CATCH),
+
+      _           => (token_type::IDENTIFIER, 0),
     };
-    Option::Some(( token_type, flag, len ))
+    return Option::Some(( token_type, flag, len ))
   } else {
     return Option::None
   }

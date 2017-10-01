@@ -1,82 +1,126 @@
 use syntax::tokenize::token_type;
+use syntax::tokenize::input_reader::InputReader;
 
-pub fn string (source: &str) -> Option<( u16, u32, usize )> {
-  let mut chars = source.chars();
-  match chars.next() {
-    Some(start_char) => {
-      match start_char {
-        '\'' | '"' => {
-          let mut len = 1;
-          let mut maybe = true;
-          let mut escaped = false;
-          loop {
-            if escaped {
-              escaped = false;
-              if Option::None == chars.next() {
-                break;
-              }
-              len += 1;
-            } else {
-              match chars.next() {
-                Some(c) => {
-                  len += 1;
-                  if c == '\\' {
-                    escaped = true;
-                  } else if c == start_char {
-                    maybe = false;
-                    break;
-                  }
-                },
-                None => {
-                  break;
-                },
-              }
-            }
-          }
-          if len > 0 {
-            Option::Some(( token_type::StringLiteral, 0, len ))
-          } else {
-            Option::None
-          }
-        },
-        _ => Option::None,
+pub fn string (reader: &mut InputReader) -> Option<( u16, u32, usize )> {
+  let start_char = reader.next();
+  match start_char {
+    '\'' | '"' => {
+      let mut len = 1;
+      let mut escaped = false;
+      loop {
+        let c = reader.next();
+        if c == '\0' {
+          break;
+        }
+        len += 1;
+        if escaped {
+          escaped = false;
+        } else if c == '\\' {
+          escaped = true;
+        } else if c == start_char {
+          return Option::Some(( token_type::STRING_LITERAL, 0, len ));
+        }
       }
+      return Option::None;
     },
-    None => Option::None,
+    _ => Option::None,
   }
 }
 
-pub fn number (source: &str) -> Option<( u16, u32, usize )> {
-  let len = numberAsLen(source);
+pub fn number (reader: &mut InputReader) -> Option<( u16, u32, usize )> {
+  let len = numberWithLen(reader);
   if len > 0 {
-    Option::Some(( token_type::NumericLiteral, 0, len ))
+    Option::Some(( token_type::NUMERIC_LITERAL, 0, len ))
   } else {
     Option::None
   }
 }
 
-fn numberAsLen (source: &str) -> usize {
-  let mut chars = source.chars();
-  match chars.next() {
-    Some (c) => {
-      match c {
-        '0' => {
-          match chars.next() {
-            Some (c) => {
-              1
-            },
-            None => 1,
-          }
-        },
-        '.' => {
-          1
-        },
-        '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' => {
-          1
-        },
-        _ => 0,
+fn numberWithLen (reader: &mut InputReader) -> usize {
+  match reader.next() {
+    '0' => {
+      let (acceptZero, len) = match reader.next() {
+        'b' => (false, binNumberWithLen(reader)),
+        'x' => (false, hexNumberWithLen(reader)),
+        '.' => (true, deciNumberWithLen(reader, false, true)),
+        '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' =>
+          (true, deciNumberWithLen(reader, true, true)),
+        'e' | 'E' => (false, deciNumberWithLen(reader, false, false)),
+        _ => (false, 0),
+      };
+      if !acceptZero && len == 0 {
+        return 1;
+      } else {
+        return len + 2;
       }
     },
-    None => 0,
+    '.' => {
+      1 + deciNumberWithLen(reader, false, true)
+    },
+    '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' => {
+      1 + deciNumberWithLen(reader, true, true)
+    },
+    _ => 0,
   }
+}
+
+fn binNumberWithLen (reader: &mut InputReader) -> usize {
+  let mut len = 0;
+  loop {
+    match reader.next() {
+      '0' | '1' => {
+        len += 1;
+      },
+      _ => {
+        break;
+      },
+    }
+  }
+  return len;
+}
+
+fn hexNumberWithLen (reader: &mut InputReader) -> usize {
+  let mut len = 0;
+  loop {
+    match reader.next() {
+      'a' | 'A' | 'b' | 'B' | 'c' | 'C' | 'd' | 'D' | 'e' | 'E' | 'f' | 'F' |
+      '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' => {
+        len += 1;
+      },
+      _ => {
+        break;
+      },
+    }
+  }
+  return len;
+}
+
+fn deciNumberWithLen (reader: &mut InputReader, acceptDot: bool, acceptExp: bool) -> usize {
+  let mut len = 0;
+  loop {
+    match reader.next() {
+      '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' => {
+        len += 1;
+      },
+      '.' => {
+        if acceptDot {
+          len += 1 + deciNumberWithLen(reader, false, true);
+        }
+        break;
+      },
+      'e' | 'E' => {
+        if acceptExp {
+          let sublen = deciNumberWithLen(reader, false, false);
+          if sublen > 0 {
+            len += 1 + sublen;
+          }
+        }
+        break;
+      },
+      _ => {
+        break;
+      },
+    }
+  }
+  return len;
 }
