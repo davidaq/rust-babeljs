@@ -20,8 +20,11 @@ pub mod token_type {
   pub const COMMA                 : u16 = 3;
 
   // Comment
-  pub const LINE_COMMENT          : u16 = 4 | COPY_SOURCE;
-  pub const BLOCK_COMMENT         : u16 = 5 | COPY_SOURCE;
+  pub const COMMENT               : u16 = 4 | COPY_SOURCE;
+  pub mod comment {
+    pub const LINE                  : u32 = 0;
+    pub const BLOCK                 : u32 = 1;
+  }
 
   // Keyword
   pub const KEYWORD               : u16 = 6;
@@ -84,28 +87,27 @@ pub mod token_type {
   pub const OPERATOR              : u16 = 31;
   pub mod operator {
     pub const PLUS                  : u32 = 10; // +
-    pub const INCRE                 : u32 = 10; // ++
-    pub const MINUS                 : u32 = 11; // -
-    pub const DECRE                 : u32 = 12; // --
-    pub const STAR                  : u32 = 13; // *
-    pub const MULTIPLY              : u32 = 13; // *
-    pub const POW                   : u32 = 14; // **
-    pub const DIVIDE                : u32 = 15; // /
-    pub const MOD                   : u32 = 16; // %
-    pub const B_AND                 : u32 = 17; // &
-    pub const B_OR                  : u32 = 18; // |
-    pub const XOR                   : u32 = 19; // ^
-    pub const NOT                   : u32 = 20; // !
-    pub const AND                   : u32 = 21; // &&
-    pub const OR                    : u32 = 22; // ||
-    pub const LT                    : u32 = 23; // <
-    pub const GT                    : u32 = 24; // >
-    pub const ELT                   : u32 = 25; // <=
-    pub const EGT                   : u32 = 26; // >=
-    pub const LEFT_SHIFT            : u32 = 27; // <<
-    pub const RIGHT_SHIFT           : u32 = 28; // >>
-    pub const U_RIGHT_SHIFT         : u32 = 29; // >>>
-    pub const AT                    : u32 = 30; // @
+    pub const INCRE                 : u32 = 11; // ++
+    pub const MINUS                 : u32 = 12; // -
+    pub const DECRE                 : u32 = 13; // --
+    pub const STAR                  : u32 = 14; // *
+    pub const MULTIPLY              : u32 = 14; // *
+    pub const POW                   : u32 = 15; // **
+    pub const DIVIDE                : u32 = 16; // /
+    pub const MOD                   : u32 = 17; // %
+    pub const B_AND                 : u32 = 18; // &
+    pub const B_OR                  : u32 = 19; // |
+    pub const XOR                   : u32 = 20; // ^
+    pub const NOT                   : u32 = 21; // !
+    pub const AND                   : u32 = 22; // &&
+    pub const OR                    : u32 = 23; // ||
+    pub const LT                    : u32 = 24; // <
+    pub const GT                    : u32 = 25; // >
+    pub const ELT                   : u32 = 26; // <=
+    pub const EGT                   : u32 = 27; // >=
+    pub const LEFT_SHIFT            : u32 = 28; // <<
+    pub const RIGHT_SHIFT           : u32 = 29; // >>
+    pub const U_RIGHT_SHIFT         : u32 = 30; // >>>
     pub const QUERY                 : u32 = 31; // ?
     pub const HASH                  : u32 = 32; // #
     pub const STRICT_EQUAL          : u32 = 33; // ===
@@ -120,9 +122,10 @@ pub mod token_type {
     pub const DIVIDE_ASSIGN         : u32 = 42; // /=
     pub const B_AND_ASSIGN          : u32 = 43; // &=
     pub const B_OR_ASSIGN           : u32 = 44; // |=
-    pub const IN                    : u32 = 45;
-    pub const OF                    : u32 = 46;
-    pub const INSTANCEOF            : u32 = 47;
+    pub const AT                    : u32 = 45; // @
+    pub const IN                    : u32 = 46;
+    pub const OF                    : u32 = 47;
+    pub const INSTANCEOF            : u32 = 48;
   }
 
   // Error

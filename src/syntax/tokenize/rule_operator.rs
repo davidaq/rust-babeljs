@@ -12,6 +12,11 @@ pub fn all (reader: &mut InputReader) -> Option<( u16, u32, usize )> {
     ']' => Option::Some(( token_type::BRACKET, token_type::brace::RIGHT, 1 )),
     '{' => Option::Some(( token_type::BRACE, token_type::brace::LEFT, 1 )),
     '}' => Option::Some(( token_type::BRACE, token_type::brace::RIGHT, 1 )),
+    '%' => Option::Some(( token_type::OPERATOR, token_type::operator::MOD, 1 )),
+    '^' => Option::Some(( token_type::OPERATOR, token_type::operator::XOR, 1 )),
+    '?' => Option::Some(( token_type::OPERATOR, token_type::operator::QUERY, 1 )),
+    '@' => Option::Some(( token_type::OPERATOR, token_type::operator::AT, 1 )),
+    '#' => Option::Some(( token_type::OPERATOR, token_type::operator::HASH, 1 )),
     '+' => match reader.next() {
       '+' => Option::Some(( token_type::OPERATOR, token_type::operator::INCRE, 2 )),
       '=' => Option::Some(( token_type::OPERATOR, token_type::operator::PLUS_ASSIGN, 2 )),
@@ -41,8 +46,6 @@ pub fn all (reader: &mut InputReader) -> Option<( u16, u32, usize )> {
       },
       _ => Option::Some(( token_type::OPERATOR, token_type::operator::NOT, 1 )),
     },
-    '?' => Option::Some(( token_type::OPERATOR, token_type::operator::QUERY, 1 )),
-    '@' => Option::Some(( token_type::OPERATOR, token_type::operator::AT, 1 )),
     '>' => match reader.next() {
       '>' => match reader.next() {
         '>' => Option::Some(( token_type::OPERATOR, token_type::operator::U_RIGHT_SHIFT, 3 )),
@@ -52,7 +55,7 @@ pub fn all (reader: &mut InputReader) -> Option<( u16, u32, usize )> {
       _ => Option::Some(( token_type::OPERATOR, token_type::operator::GT, 1 )),
     },
     '<' => match reader.next() {
-      '<' => Option::Some(( token_type::OPERATOR, token_type::operator::LEFT_SHIFT, 3 )),
+      '<' => Option::Some(( token_type::OPERATOR, token_type::operator::LEFT_SHIFT, 2 )),
       '=' => Option::Some(( token_type::OPERATOR, token_type::operator::ELT, 2 )),
       _ => Option::Some(( token_type::OPERATOR, token_type::operator::LT, 1 )),
     },
@@ -62,6 +65,16 @@ pub fn all (reader: &mut InputReader) -> Option<( u16, u32, usize )> {
         _ => Option::Some(( token_type::OPERATOR, token_type::operator::EQUAL, 2 )),
       },
       _ => Option::Some(( token_type::OPERATOR, token_type::operator::ASSIGN, 1 )),
+    },
+    '&' => match reader.next() {
+      '&' => Option::Some(( token_type::OPERATOR, token_type::operator::AND, 2 )),
+      '=' => Option::Some(( token_type::OPERATOR, token_type::operator::B_AND_ASSIGN, 2 )),
+      _ => Option::Some(( token_type::OPERATOR, token_type::operator::B_AND, 1 )),
+    },
+    '|' => match reader.next() {
+      '|' => Option::Some(( token_type::OPERATOR, token_type::operator::OR, 2 )),
+      '=' => Option::Some(( token_type::OPERATOR, token_type::operator::B_OR_ASSIGN, 2 )),
+      _ => Option::Some(( token_type::OPERATOR, token_type::operator::B_OR, 1 )),
     },
     _ => Option::None,
   }

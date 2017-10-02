@@ -14,8 +14,8 @@ fn main() {
         scope.spawn(|| {
             Tokenizer::new(&source_queue, &token_queue).run();
         });
-        source_queue.push(String::from(" if (1 + 1> 2) {"));
-        source_queue.push(String::from("alert ('hello world');"));
+        source_queue.push(String::from(" if (1/*hehe*/ + 1> 2) {"));
+        source_queue.push(String::from("alert ('hello world');//alert\n"));
         source_queue.push(String::from("} else if {}"));
         source_queue.push(String::from("var a = 1; a++;"));
         source_queue.end();

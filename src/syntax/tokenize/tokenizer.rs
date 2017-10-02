@@ -46,6 +46,7 @@ impl<'a> Tokenizer<'a> {
         }
       }
       match_token_rule!(rule_whitespace::all);
+      match_token_rule!(rule_comment::all);
       match_token_rule!(rule_literal::string);
       match_token_rule!(rule_literal::number);
       match_token_rule!(rule_identifier::all);

@@ -7,6 +7,7 @@ mod tokenizer;
 pub use self::tokenizer::*;
 
 mod rule_whitespace;
+mod rule_comment;
 mod rule_identifier;
 mod rule_operator;
 mod rule_literal;
