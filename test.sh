@@ -20,4 +20,20 @@ fetch () {
   rm -rf $FETCH_TMP_DIR
 }
 
-$1
+run () {
+  cargo build || exit 1
+  runcase () {
+    echo [ $1 ]
+    cat $1 | ./target/debug/rust-babeljs.exe pipe
+    local status=$?
+    if [ $status -ne 0 ]; then
+      cat $1
+      echo ''
+      echo "Failed" >&2
+      exit 1
+    fi
+  }
+  find test-case/fixtures/$2/ -name actual.js | while read x; do runcase $x; done
+}
+
+$@
