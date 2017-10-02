@@ -7,10 +7,15 @@ pub fn string (reader: &mut InputReader) -> Option<( u16, u32, usize )> {
     '\'' | '"' => {
       let mut len = 1;
       let mut escaped = false;
+      let mut flag = 0;
       loop {
         let c = reader.next();
-        if c == '\0' {
-          break;
+        match c {
+          '\0' => return Option::None,
+          '\n' | '\r' => {
+            flag = 1;
+          },
+          _ => (),
         }
         len += 1;
         if escaped {
@@ -18,10 +23,10 @@ pub fn string (reader: &mut InputReader) -> Option<( u16, u32, usize )> {
         } else if c == '\\' {
           escaped = true;
         } else if c == start_char {
-          return Option::Some(( token_type::STRING_LITERAL, 0, len ));
+          break;
         }
       }
-      return Option::None;
+      return Option::Some(( token_type::STRING_LITERAL, flag, len ));
     },
     _ => Option::None,
   }

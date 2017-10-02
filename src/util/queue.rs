@@ -10,6 +10,7 @@ pub struct Queue<T> {
   waiting: Cell<usize>,
   syn: Mutex<u8>,
   sem: Semaphore,
+  name: String,
 }
 
 unsafe impl<T> Sync for Queue<T> {}
@@ -17,20 +18,21 @@ unsafe impl<T> Send for Queue<T> {}
 
 impl<T> Queue<T> {
 
-  pub fn new () -> Self {
+  pub fn new (name: &str) -> Self {
     Queue::<T> {
       syn: Mutex::new(0),
       sem: Semaphore::new(0),
       waiting: Cell::new(0),
       ended: Cell::new(false),
       list: RefCell::new(VecDeque::with_capacity(20)),
+      name: String::from(name),
     }
   }
 
   pub fn push (&self, item: T) {
     let lock = self.syn.lock();
     if self.ended.get() {
-      panic!("Ended queues are read only!");
+      panic!("Ended queue \"{}\" is read only!", self.name);
     }
     self.list.borrow_mut().push_back(item);
     self.sem.release();

@@ -56,9 +56,15 @@ pub mod token_type {
     pub const LET                   : u32 = 41;
     pub const CONST                 : u32 = 42;
 
+    // Module
+    pub const IMPORT                : u32 = 52;
+    pub const FROM                  : u32 = 52;
+    pub const EXPORT                : u32 = 52;
+    pub const DEFAULT               : u32 = 52;
+
     // Error Handling
-    pub const TRY                   : u32 = 52;
-    pub const CATCH                 : u32 = 53;
+    pub const TRY                   : u32 = 62;
+    pub const CATCH                 : u32 = 63;
   }
 
   // Scope Wrapping
@@ -122,10 +128,11 @@ pub mod token_type {
     pub const DIVIDE_ASSIGN         : u32 = 42; // /=
     pub const B_AND_ASSIGN          : u32 = 43; // &=
     pub const B_OR_ASSIGN           : u32 = 44; // |=
-    pub const AT                    : u32 = 45; // @
-    pub const IN                    : u32 = 46;
-    pub const OF                    : u32 = 47;
-    pub const INSTANCEOF            : u32 = 48;
+    pub const B_INVERT              : u32 = 45; // ~
+    pub const AT                    : u32 = 47; // @
+    pub const IN                    : u32 = 48;
+    pub const OF                    : u32 = 49;
+    pub const INSTANCEOF            : u32 = 50;
   }
 
   // Error
