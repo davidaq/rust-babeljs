@@ -47,10 +47,12 @@ pub fn all (reader: &mut InputReader) -> Option<( u16, u32, usize )> {
       "var"       => (token_type::KEYWORD, token_type::keyword::VAR),
       "let"       => (token_type::KEYWORD, token_type::keyword::LET),
       "const"     => (token_type::KEYWORD, token_type::keyword::CONST),
-      "in"        => (token_type::KEYWORD, token_type::keyword::IN),
-      "of"        => (token_type::KEYWORD, token_type::keyword::OF),
       "try"       => (token_type::KEYWORD, token_type::keyword::TRY),
       "catch"     => (token_type::KEYWORD, token_type::keyword::CATCH),
+
+      "in"          => (token_type::OPERATOR, token_type::operator::IN),
+      "of"          => (token_type::OPERATOR, token_type::operator::OF),
+      "instanceof"  => (token_type::OPERATOR, token_type::operator::INSTANCEOF),
 
       _           => (token_type::IDENTIFIER, 0),
     };

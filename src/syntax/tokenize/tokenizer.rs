@@ -36,7 +36,7 @@ impl<'a> Tokenizer<'a> {
                 token_type = result.0;
                 flag = result.1;
                 len = result.2;
-                if (token_type::COPY_SOURCE & token_type) > 0 {
+                if (token_type::COPY_SOURCE & token_type) == token_type::COPY_SOURCE {
                   content = Option::Some(String::from(self.reader.content(len)));
                 }
                 self.reader.commit(len);
@@ -49,7 +49,7 @@ impl<'a> Tokenizer<'a> {
       match_token_rule!(rule_literal::string);
       match_token_rule!(rule_literal::number);
       match_token_rule!(rule_identifier::all);
-      match_token_rule!(rule_singlechar::all); // This must be last
+      match_token_rule!(rule_operator::all);
 
       let end = self.parse_pos + if token_type == token_type::UNEXPECTED { 1 } else { len };
       self.output.push(Token {

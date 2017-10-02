@@ -8,5 +8,5 @@ pub use self::tokenizer::*;
 
 mod rule_whitespace;
 mod rule_identifier;
-mod rule_singlechar;
+mod rule_operator;
 mod rule_literal;

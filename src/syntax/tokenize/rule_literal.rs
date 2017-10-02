@@ -110,9 +110,17 @@ fn deciNumberWithLen (reader: &mut InputReader, acceptDot: bool, acceptExp: bool
       },
       'e' | 'E' => {
         if acceptExp {
-          let sublen = deciNumberWithLen(reader, false, false);
-          if sublen > 0 {
-            len += 1 + sublen;
+          match reader.next() {
+            '-' => {
+              let sublen = deciNumberWithLen(reader, false, false);
+              if sublen > 0 {
+                len += 2 + sublen;
+              }
+            },
+            '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' => {
+              len += 2 + deciNumberWithLen(reader, false, false);
+            },
+            _ => (),
           }
         }
         break;

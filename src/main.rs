@@ -16,7 +16,8 @@ fn main() {
         });
         source_queue.push(String::from(" if (1 + 1> 2) {"));
         source_queue.push(String::from("alert ('hello world');"));
-        source_queue.push(String::from("} else if{}"));
+        source_queue.push(String::from("} else if {}"));
+        source_queue.push(String::from("var a = 1; a++;"));
         source_queue.end();
         loop {
             match token_queue.pop() {
