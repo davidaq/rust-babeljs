@@ -103,7 +103,7 @@ pub mod token_type {
   pub const FUNCTION              : u16 = 50;
   pub const RETURN                : u16 = 51 | BEFORE_EXPR;
   pub const ASYNC                 : u16 = 52;
-  pub const AWAIT                 : u16 = 53;
+  pub const AWAIT                 : u16 = 53 | BEFORE_EXPR;
   pub const THROW                 : u16 = 54 | BEFORE_EXPR;
   pub const YIELD                 : u16 = 55 | BEFORE_EXPR;
   
@@ -117,11 +117,11 @@ pub mod token_type {
   pub const ELSE                  : u16 = 71 | BEFORE_EXPR;
   pub const SWITCH                : u16 = 72;
   pub const CASE                  : u16 = 73 | BEFORE_EXPR;
-  pub const WHILE                 : u16 = 74;
-  pub const FOR                   : u16 = 75;
+  pub const WHILE                 : u16 = 74 | IS_LOOP;
+  pub const FOR                   : u16 = 75 | IS_LOOP;
   pub const BREAK                 : u16 = 76;
   pub const CONTINUE              : u16 = 77;
-  pub const DO                    : u16 = 78 | BEFORE_EXPR;
+  pub const DO                    : u16 = 78 | BEFORE_EXPR | IS_LOOP;
   pub const WITH                  : u16 = 79;
 
   // Keyword - Variable
