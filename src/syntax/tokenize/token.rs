@@ -20,9 +20,9 @@ pub mod token_type {
   pub const WHITE_SPACE           : u16 = 0 | COPY_SOURCE;
 
   // Seperation
-  pub const COLON                 : u16 = 1;
-  pub const SEMI_COLON            : u16 = 2;
-  pub const COMMA                 : u16 = 3;
+  pub const COLON                 : u16 = 1 | BEFORE_EXPR;
+  pub const SEMI_COLON            : u16 = 2 | BEFORE_EXPR;
+  pub const COMMA                 : u16 = 3 | BEFORE_EXPR;
 
   // Comment
   pub const COMMENT               : u16 = 4 | COPY_SOURCE;
@@ -30,72 +30,35 @@ pub mod token_type {
     pub const LINE                  : u32 = 0;
     pub const BLOCK                 : u32 = 1;
   }
-
-  // Keyword
-  pub const KEYWORD               : u16 = 6;
-  pub mod keyword {
-    // Function
-    pub const FUNCTION              : u32 = 10;
-    pub const RETURN                : u32 = 11;
-    pub const ASYNC                 : u32 = 12;
-    pub const AWAIT                 : u32 = 13;
-    pub const THROW                 : u32 = 14;
-    pub const YIELD                 : u32 = 15;
-    
-    // Class
-    pub const CLASS                 : u32 = 20;
-    pub const EXTENDS               : u32 = 21;
-    pub const STATIC                : u32 = 22;
-
-    // Flow Control
-    pub const IF                    : u32 = 30;
-    pub const ELSE                  : u32 = 31;
-    pub const WHILE                 : u32 = 32;
-    pub const FOR                   : u32 = 33;
-    pub const BREAK                 : u32 = 34;
-    pub const CONTINUE              : u32 = 35;
-    pub const DO                    : u32 = 36;
-
-    // Variable
-    pub const VAR                   : u32 = 40;
-    pub const LET                   : u32 = 41;
-    pub const CONST                 : u32 = 42;
-
-    // Module
-    pub const IMPORT                : u32 = 52;
-    pub const FROM                  : u32 = 52;
-    pub const EXPORT                : u32 = 52;
-    pub const DEFAULT               : u32 = 52;
-
-    // Error Handling
-    pub const TRY                   : u32 = 62;
-    pub const CATCH                 : u32 = 63;
-  }
-
   // Scope Wrapping
-  pub const PARENTHESIS           : u16 = 10;
-  pub const BRACKET               : u16 = 11;
-  pub const BRACE                 : u16 = 12;
-  pub mod brace {
-    pub const LEFT                  : u32 = 0;
-    pub const RIGHT                 : u32 = 0;
-  }
+  pub const PARENTHESIS_L         : u16 = 10 | BEFORE_EXPR;
+  pub const PARENTHESIS_R         : u16 = 11;
+  pub const BRACKET_L             : u16 = 12 | BEFORE_EXPR;
+  pub const BRACKET_R             : u16 = 13;
+  pub const BRACE_L               : u16 = 14 | BEFORE_EXPR;
+  pub const BRACE_R               : u16 = 15;
 
   // Values
   pub const IDENTIFIER            : u16 = 20 | COPY_SOURCE;
   pub const REGEX_LITERAL         : u16 = 21 | COPY_SOURCE;
-  pub const STRING_LITERAL        : u16 = 21 | COPY_SOURCE;
-  pub const TPL_STRING_LITERAL    : u16 = 22 | COPY_SOURCE;
-  pub const NUMERIC_LITERAL       : u16 = 23 | COPY_SOURCE;
-  pub const BOOLEAN_LITERAL       : u16 = 24;
+  pub const STRING_LITERAL        : u16 = 22 | COPY_SOURCE;
+  pub const TPL_STR_LITERAL       : u16 = 23 | COPY_SOURCE;
+  pub const TPL_STR_L             : u16 = 24 | COPY_SOURCE | BEFORE_EXPR;
+  pub const TPL_STR_R             : u16 = 25 | COPY_SOURCE;
+  pub const TPL_STR_RL            : u16 = 26 | COPY_SOURCE | BEFORE_EXPR;
+  pub const NUMERIC_LITERAL       : u16 = 27 | COPY_SOURCE;
+  pub const BOOLEAN_LITERAL       : u16 = 28;
   pub mod boolean {
     pub const TRUE                : u32 = 1;
     pub const FALSE               : u32 = 0;
   }
 
   // Operation
-  pub const ARROW                 : u16 = 30;
-  pub const OPERATOR              : u16 = 31;
+  pub const ARROW                 : u16 = 30 | BEFORE_EXPR;
+  pub const QUERY                 : u16 = 31 | BEFORE_EXPR; // ?
+  pub const DOT                   : u16 = 32 | BEFORE_EXPR; // .
+  pub const ELIPSIS               : u16 = 33 | BEFORE_EXPR; // ...
+  pub const OPERATOR              : u16 = 39;
   pub mod operator {
     pub const PLUS                  : u32 = 10; // +
     pub const INCRE                 : u32 = 11; // ++
@@ -119,7 +82,6 @@ pub mod token_type {
     pub const LEFT_SHIFT            : u32 = 28; // <<
     pub const RIGHT_SHIFT           : u32 = 29; // >>
     pub const U_RIGHT_SHIFT         : u32 = 30; // >>>
-    pub const QUERY                 : u32 = 31; // ?
     pub const HASH                  : u32 = 32; // #
     pub const STRICT_EQUAL          : u32 = 33; // ===
     pub const EQUAL                 : u32 = 34; // ==
@@ -135,10 +97,56 @@ pub mod token_type {
     pub const B_OR_ASSIGN           : u32 = 44; // |=
     pub const B_INVERT              : u32 = 45; // ~
     pub const AT                    : u32 = 47; // @
-    pub const IN                    : u32 = 48;
-    pub const OF                    : u32 = 49;
-    pub const INSTANCEOF            : u32 = 50;
   }
+
+  // Keyword - Function
+  pub const FUNCTION              : u16 = 50;
+  pub const RETURN                : u16 = 51 | BEFORE_EXPR;
+  pub const ASYNC                 : u16 = 52;
+  pub const AWAIT                 : u16 = 53;
+  pub const THROW                 : u16 = 54 | BEFORE_EXPR;
+  pub const YIELD                 : u16 = 55 | BEFORE_EXPR;
+  
+  // Keyword - Class
+  pub const CLASS                 : u16 = 60;
+  pub const EXTENDS               : u16 = 61 | BEFORE_EXPR;
+  pub const STATIC                : u16 = 62;
+
+  // Keyword - Flow Control
+  pub const IF                    : u16 = 70;
+  pub const ELSE                  : u16 = 71 | BEFORE_EXPR;
+  pub const SWITCH                : u16 = 72;
+  pub const CASE                  : u16 = 73 | BEFORE_EXPR;
+  pub const WHILE                 : u16 = 74;
+  pub const FOR                   : u16 = 75;
+  pub const BREAK                 : u16 = 76;
+  pub const CONTINUE              : u16 = 77;
+  pub const DO                    : u16 = 78 | BEFORE_EXPR;
+  pub const WITH                  : u16 = 79;
+
+  // Keyword - Variable
+  pub const VAR                   : u16 = 80;
+  pub const LET                   : u16 = 81;
+  pub const CONST                 : u16 = 82;
+  pub const TYPEOF                : u16 = 84 | BEFORE_EXPR;
+  pub const INSTANCEOF            : u16 = 85 | BEFORE_EXPR;
+  pub const IN                    : u16 = 86 | BEFORE_EXPR;
+  pub const OF                    : u16 = 87 | BEFORE_EXPR;
+  pub const NEW                   : u16 = 88 | BEFORE_EXPR;
+  pub const DELETE                : u16 = 89 | BEFORE_EXPR;
+
+  // Keyword - Module
+  pub const IMPORT                : u16 = 90;
+  pub const FROM                  : u16 = 91;
+  pub const EXPORT                : u16 = 92;
+  pub const DEFAULT               : u16 = 93 | BEFORE_EXPR;
+
+  // Keyword - Error Handling
+  pub const TRY                   : u16 = 101;
+  pub const CATCH                 : u16 = 102;
+
+  // Keyword - Other
+  pub const VOID                  : u16 = 110 | BEFORE_EXPR;
 
   // Error
   pub const UNEXPECTED            : u16 = 0xffff;

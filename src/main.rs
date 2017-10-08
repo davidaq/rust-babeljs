@@ -42,6 +42,10 @@ fn main() {
                     }
                     source_queue.end();
                 },
+                "ipc" => {
+                    println!("IPC not implemented");
+                    process::exit(1);
+                },
                 _ => {
                     let filename = &mode;
                     let filein = fs::File::open(filename).expect("File not found");
