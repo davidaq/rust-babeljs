@@ -21,10 +21,10 @@ fetch () {
 }
 
 run () {
-  cargo build || exit 1
+  RUSTFLAGS="$RUSTFLAGS -A dead_code" cargo build || exit 1
   runcase () {
     echo [ $1 ]
-    cat $1 | ./target/debug/rust-babeljs.exe pipe
+    ./target/debug/rust-babeljs.exe "$1"
     local status=$?
     if [ $status -ne 0 ]; then
       cat $1

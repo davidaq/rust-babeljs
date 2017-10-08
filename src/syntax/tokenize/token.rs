@@ -9,7 +9,12 @@ pub struct Token {
 }
 
 pub mod token_type {
-  pub const COPY_SOURCE           : u16 = 0b1000000000000000;
+  // MARKER
+  pub const COPY_SOURCE           : u16 = 1 << 15;
+  pub const BEFORE_EXPR           : u16 = 1 << 14;
+  pub const IS_LOOP               : u16 = 1 << 13;
+
+  pub const ALL_MARKER            : u16 = COPY_SOURCE | BEFORE_EXPR;
 
   // Space, Tab and Line Breaks
   pub const WHITE_SPACE           : u16 = 0 | COPY_SOURCE;

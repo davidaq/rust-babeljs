@@ -1,8 +1,7 @@
 use syntax::tokenize::token_type;
 use syntax::tokenize::input_reader::InputReader;
-use super::rule_identifier;
 
-// Must placed before comment, intepretor detect following identifier as regex flags
+// Must placed after comment, interpretor detect following identifier as regex flags
 pub fn all (reader: &mut InputReader) -> Option<( u16, u32, usize )> {
   match reader.next() {
     '/' => {
@@ -10,25 +9,27 @@ pub fn all (reader: &mut InputReader) -> Option<( u16, u32, usize )> {
       let mut escaped = false;
       loop {
         if escaped {
-          match reader.next() {
-            '\0' | '\n' => {
+          let c = reader.next();
+          match c {
+            '\0' | '\n' | '\r' => {
               return Option::None;
             },
             _ => {
               escaped = false;
-              len += 1;
+              len += c.len_utf8();
             }
           }
         } else {
-          len += 1;
-          match reader.next() {
+          let c = reader.next();
+          len += c.len_utf8();
+          match c {
             '\\' => {
               escaped = true;
             },
             '/' => {
               break;
             },
-            '\0' | '\n' => {
+            '\0' | '\n' | '\r' => {
               return Option::None;
             },
             _ => (),

@@ -1,7 +1,11 @@
 use util::Queue;
-use std::str::Chars;
+
+pub struct State {
+
+}
 
 pub struct InputReader<'a> {
+  pub state: State,
   input: &'a Queue<String>,
   buffer: String,
   buffer_len: usize,
@@ -12,6 +16,7 @@ pub struct InputReader<'a> {
 impl<'a> InputReader<'a> {
   pub fn new (input: &'a Queue<String>) -> Self {
     InputReader {
+      state: State { },
       input: input,
       buffer: String::from(""),
       buffer_len: 0,
@@ -21,31 +26,24 @@ impl<'a> InputReader<'a> {
   }
 
   pub fn commit (&mut self, len: usize) {
-    let byte_len = self.byte_len(len);
-    self.buffer.drain(0..byte_len);
+    self.buffer.drain(0..len);
     self.buffer_len = self.buffer.chars().count();
-    self.reset();
+    self.cursor = 0;
   }
 
   pub fn reset (&mut self) {
     self.cursor = 0;
+    if self.buffer_len > 0 {
+      self.ended = false;
+    }
   }
 
   pub fn content (&mut self, len: usize) -> &str {
-    let byte_len = self.byte_len(len);
-    return &self.buffer[..byte_len];
-  }
-
-  fn byte_len (&mut self, len: usize) -> usize {
-    let mut byte_len = 0;
-    let mut chars = self.buffer.chars();
-    for x in 0..len {
-      match chars.next() {
-        Some (c) => byte_len += c.len_utf8(),
-        None => break,
-      }
+    if len >= self.buffer_len {
+      return &self.buffer;
+    } else {
+      return &self.buffer[..len];
     }
-    return byte_len;
   }
 
   fn load_input (&mut self) {
@@ -82,9 +80,9 @@ impl<'a> InputReader<'a> {
     return ret;
   }
 
-  pub fn back (&mut self) {
+  pub fn back (&mut self, len: usize) {
     if self.cursor > 0 {
-      self.cursor -= 1;
+      self.cursor -= len;
     }
   }
 

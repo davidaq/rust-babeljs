@@ -53,10 +53,13 @@ impl<'a> Tokenizer<'a> {
       match_token_rule!(rule_identifier::all);
       match_token_rule!(rule_operator::all);
 
-      let end = self.parse_pos + if token_type == token_type::UNEXPECTED { 1 } else { len };
+      let end = self.parse_pos + if token_type == token_type::UNEXPECTED {
+        content = Option::Some(String::from(self.reader.content(5)));
+        1
+      } else { len };
       self.output.push(Token {
         token_type: token_type,
-        flag: 0,
+        flag: flag,
         start: self.parse_pos,
         end: end,
         content: content,

@@ -30,7 +30,7 @@ impl<T> Queue<T> {
   }
 
   pub fn push (&self, item: T) {
-    let lock = self.syn.lock();
+    let _mutex_guard = self.syn.lock();
     if self.ended.get() {
       panic!("Ended queue \"{}\" is read only!", self.name);
     }
@@ -39,29 +39,29 @@ impl<T> Queue<T> {
   }
 
   pub fn interrupt (&self) {
-    let lock = self.syn.lock();
-    for x in 0..self.waiting.get() {
+    let _mutex_guard = self.syn.lock();
+    for _ in 0..self.waiting.get() {
       self.sem.release();
     }
   }
 
   pub fn end (&self) {
-    let lock = self.syn.lock();
+    let _mutex_guard = self.syn.lock();
     self.ended.set(true);
-    for x in 0..self.waiting.get() {
+    for _ in 0..self.waiting.get() {
       self.sem.release();
     }
   }
 
-  pub fn hasMore (&self) -> bool {
-    let lock = self.syn.lock();
+  pub fn has_more (&self) -> bool {
+    let _mutex_guard = self.syn.lock();
     return self.list.borrow().len() > 0;
   }
 
   pub fn pop (&self) -> Option<T> {
-    let mut ended = false;
+    let ended;
     {
-      let lock = self.syn.lock();
+      let _mutex_guard = self.syn.lock();
       ended = self.ended.get();
       if !ended {
         self.waiting.set(self.waiting.get() + 1);
@@ -70,7 +70,7 @@ impl<T> Queue<T> {
     if !ended {
       self.sem.acquire();
     }
-    let lock = self.syn.lock();
+    let _mutex_guard = self.syn.lock();
     if !ended {
       self.waiting.set(self.waiting.get() - 1);
     }

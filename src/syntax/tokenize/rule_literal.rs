@@ -33,7 +33,7 @@ pub fn string (reader: &mut InputReader) -> Option<( u16, u32, usize )> {
 }
 
 pub fn number (reader: &mut InputReader) -> Option<( u16, u32, usize )> {
-  let len = numberWithLen(reader);
+  let len = number_len(reader);
   if len > 0 {
     Option::Some(( token_type::NUMERIC_LITERAL, 0, len ))
   } else {
@@ -41,35 +41,35 @@ pub fn number (reader: &mut InputReader) -> Option<( u16, u32, usize )> {
   }
 }
 
-fn numberWithLen (reader: &mut InputReader) -> usize {
+fn number_len (reader: &mut InputReader) -> usize {
   match reader.next() {
     '0' => {
-      let (acceptZero, len) = match reader.next() {
-        'b' => (false, binNumberWithLen(reader)),
-        'x' => (false, hexNumberWithLen(reader)),
-        '.' => (true, deciNumberWithLen(reader, false, true)),
+      let (accept_zero, len) = match reader.next() {
+        'b' => (false, bin_number_len(reader)),
+        'x' => (false, hex_number_len(reader)),
+        '.' => (true, deci_number_len(reader, false, true)),
         '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' =>
-          (true, deciNumberWithLen(reader, true, true)),
-        'e' | 'E' => (false, deciNumberWithLen(reader, false, false)),
+          (true, deci_number_len(reader, true, true)),
+        'e' | 'E' => (false, deci_number_len(reader, false, false)),
         _ => (false, 0),
       };
-      if !acceptZero && len == 0 {
+      if !accept_zero && len == 0 {
         return 1;
       } else {
         return len + 2;
       }
     },
     '.' => {
-      1 + deciNumberWithLen(reader, false, true)
+      1 + deci_number_len(reader, false, true)
     },
     '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' => {
-      1 + deciNumberWithLen(reader, true, true)
+      1 + deci_number_len(reader, true, true)
     },
     _ => 0,
   }
 }
 
-fn binNumberWithLen (reader: &mut InputReader) -> usize {
+fn bin_number_len (reader: &mut InputReader) -> usize {
   let mut len = 0;
   loop {
     match reader.next() {
@@ -84,7 +84,7 @@ fn binNumberWithLen (reader: &mut InputReader) -> usize {
   return len;
 }
 
-fn hexNumberWithLen (reader: &mut InputReader) -> usize {
+fn hex_number_len (reader: &mut InputReader) -> usize {
   let mut len = 0;
   loop {
     match reader.next() {
@@ -100,7 +100,7 @@ fn hexNumberWithLen (reader: &mut InputReader) -> usize {
   return len;
 }
 
-fn deciNumberWithLen (reader: &mut InputReader, acceptDot: bool, acceptExp: bool) -> usize {
+fn deci_number_len (reader: &mut InputReader, accept_dot: bool, accept_exp: bool) -> usize {
   let mut len = 0;
   loop {
     match reader.next() {
@@ -108,22 +108,22 @@ fn deciNumberWithLen (reader: &mut InputReader, acceptDot: bool, acceptExp: bool
         len += 1;
       },
       '.' => {
-        if acceptDot {
-          len += 1 + deciNumberWithLen(reader, false, true);
+        if accept_dot {
+          len += 1 + deci_number_len(reader, false, true);
         }
         break;
       },
       'e' | 'E' => {
-        if acceptExp {
+        if accept_exp {
           match reader.next() {
             '-' => {
-              let sublen = deciNumberWithLen(reader, false, false);
+              let sublen = deci_number_len(reader, false, false);
               if sublen > 0 {
                 len += 2 + sublen;
               }
             },
             '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' => {
-              len += 2 + deciNumberWithLen(reader, false, false);
+              len += 2 + deci_number_len(reader, false, false);
             },
             _ => (),
           }

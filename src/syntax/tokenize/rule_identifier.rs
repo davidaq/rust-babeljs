@@ -28,7 +28,7 @@ pub fn all (reader: &mut InputReader) -> Option<( u16, u32, usize )> {
       },
       _ => {
         if c > '\x7f' {
-          len += 1;
+          len += c.len_utf8();
         } else {
           break;
         }
@@ -55,7 +55,7 @@ pub fn all (reader: &mut InputReader) -> Option<( u16, u32, usize )> {
       "for"       => (token_type::KEYWORD, token_type::keyword::FOR),
       "break"     => (token_type::KEYWORD, token_type::keyword::BREAK),
       "continue"  => (token_type::KEYWORD, token_type::keyword::CONTINUE),
-      "continue"  => (token_type::KEYWORD, token_type::keyword::DO),
+      "do"        => (token_type::KEYWORD, token_type::keyword::DO),
       "var"       => (token_type::KEYWORD, token_type::keyword::VAR),
       "let"       => (token_type::KEYWORD, token_type::keyword::LET),
       "const"     => (token_type::KEYWORD, token_type::keyword::CONST),
@@ -102,7 +102,7 @@ fn match_unicode_expr (reader: &mut InputReader) -> usize {
           return len;
         },
         '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' => {
-          for i in 0..3 {
+          for _ in 0..3 {
             match reader.next() {
               '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' => (),
               _ => return 0,
