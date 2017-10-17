@@ -36,4 +36,20 @@ run () {
   find test-case/fixtures/$2/ -name actual.js | while read x; do runcase $x; done
 }
 
+run_r () {
+  RUSTFLAGS="$RUSTFLAGS -A dead_code" cargo build --release || exit 1
+  runcase () {
+    echo [ $1 ]
+    ./target/release/rust-babeljs.exe "$1"
+    local status=$?
+    if [ $status -ne 0 ]; then
+      cat $1
+      echo ''
+      echo "Failed" >&2
+      exit 1
+    fi
+  }
+  find test-case/fixtures/$2/ -name actual.js | while read x; do runcase $x; done
+}
+
 $@
