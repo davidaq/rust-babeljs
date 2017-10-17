@@ -7,6 +7,7 @@ mod util;
 use std::{ env, process, io, fs };
 use io::BufRead;
 use syntax::tokenize::{ Token, Tokenizer, token_type };
+use syntax::interpret::{ Interpretor };
 use util::Queue;
 
 fn main() {
@@ -15,6 +16,9 @@ fn main() {
     crossbeam::scope(|scope| {
         scope.spawn(|| {
             Tokenizer::new(&source_queue, &token_queue).run();
+        });
+        scope.spawn(|| {
+            Interpretor::new(&token_queue).run();
         });
         match env::args().nth(1) {
             Some (mode) => match &mode as &str {
@@ -68,33 +72,36 @@ fn main() {
                 process::exit(1);
             },
         }
-        loop {
-            match token_queue.pop() {
-                Some(token) => {
-                    match token.token_type {
-                        token_type::UNEXPECTED => match token.content {
+    });
+}
+
+fn print_tokens (token_queue: &Queue<Token>) {
+    loop {
+        match token_queue.pop() {
+            Some(token) => {
+                match token.token_type {
+                    token_type::UNEXPECTED => match token.content {
+                        Some (content) => {
+                            panic!("Unexpected: {}", content);
+                        },
+                        None => {
+                            panic!("Unexpected");
+                        },
+                    },
+                    _ => {
+                        let plain_token_type = !((!token.token_type) | token_type::ALL_MARKER);
+                        match token.content {
                             Some (content) => {
-                                panic!("Unexpected: {}", content);
+                                println!("token: {} content: {}", plain_token_type, content);
                             },
                             None => {
-                                panic!("Unexpected");
+                                println!("token: {} flag: {}", plain_token_type, token.flag);
                             },
-                        },
-                        _ => {
-                            let plain_token_type = !((!token.token_type) | token_type::ALL_MARKER);
-                            match token.content {
-                                Some (content) => {
-                                    println!("token: {} content: {}", plain_token_type, content);
-                                },
-                                None => {
-                                    println!("token: {} flag: {}", plain_token_type, token.flag);
-                                },
-                            }
-                        },
-                    };
-                },
-                None => break,
-            }
+                        }
+                    },
+                };
+            },
+            None => break,
         }
-    });
+    }
 }
