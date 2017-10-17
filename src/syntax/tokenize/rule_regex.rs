@@ -3,6 +3,9 @@ use syntax::tokenize::input_reader::InputReader;
 
 // Must placed after comment, interpretor detect following identifier as regex flags
 pub fn all (reader: &mut InputReader) -> Option<( u16, u32, usize )> {
+  if !reader.state.expr_allowed {
+    return Option::None;
+  }
   match reader.next() {
     '/' => {
       let mut len = 1;

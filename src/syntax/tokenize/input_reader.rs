@@ -1,7 +1,17 @@
 use util::Queue;
 
 pub struct State {
+  pub expr_allowed: bool,
+  pub brace_stack: Vec<bool>,
+}
 
+impl State {
+  fn new () -> Self {
+    State {
+      expr_allowed: true,
+      brace_stack: vec![],
+    }
+  }
 }
 
 pub struct InputReader<'a> {
@@ -16,7 +26,7 @@ pub struct InputReader<'a> {
 impl<'a> InputReader<'a> {
   pub fn new (input: &'a Queue<String>) -> Self {
     InputReader {
-      state: State { },
+      state: State::new(),
       input: input,
       buffer: String::from(""),
       buffer_len: 0,

@@ -21,8 +21,9 @@ impl<'a> Tokenizer<'a> {
   }
 
   pub fn run (&'a mut self) {
+    let mut prev_type = token_type::UNEXPECTED;
     while !self.reader.ended() {
-      let mut token_type : u16 = token_type::UNEXPECTED;
+      let mut token_type = token_type::UNEXPECTED;
       let mut flag : u32 = 0;
       let mut len : usize = 0;
       let mut content = Option::None;
@@ -49,6 +50,7 @@ impl<'a> Tokenizer<'a> {
       match_token_rule!(rule_comment::all);
       match_token_rule!(rule_literal::string);
       match_token_rule!(rule_literal::number);
+      match_token_rule!(rule_tplstr::all);
       match_token_rule!(rule_regex::all);
       match_token_rule!(rule_identifier::all);
       match_token_rule!(rule_operator::all);
@@ -67,6 +69,14 @@ impl<'a> Tokenizer<'a> {
       if token_type == token_type::UNEXPECTED {
         break;
       } else {
+        if token_type != token_type::WHITE_SPACE {
+          if (token_type == token_type::IDENTIFIER || (token_type & token_type::KEYWORD) > 0) && match prev_type { token_type::QUESTION_DOT | token_type::DOT => true, _ => false } {
+            self.reader.state.expr_allowed = true;
+          } else {
+            self.reader.state.expr_allowed = (token_type & token_type::BEFORE_EXPR) > 0;
+          }
+          prev_type = token_type;
+        }
         self.parse_pos += len;
       }
     }

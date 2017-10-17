@@ -19,10 +19,7 @@ fn main() {
         match env::args().nth(1) {
             Some (mode) => match &mode as &str {
                 "test" => {
-                    source_queue.push(String::from("(function () {\n"));
-                    source_queue.push(String::from(" 'use strict';\n"));
-                    source_queue.push(String::from(" ' ';\n"));
-                    source_queue.push(String::from("}())\n"));
+                    source_queue.push(String::from("`42`"));
                     source_queue.end();
                 },
                 "pipe" => {

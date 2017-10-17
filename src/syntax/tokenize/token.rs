@@ -13,8 +13,9 @@ pub mod token_type {
   pub const COPY_SOURCE           : u16 = 1 << 15;
   pub const BEFORE_EXPR           : u16 = 1 << 14;
   pub const IS_LOOP               : u16 = 1 << 13;
+  pub const KEYWORD               : u16 = 1 << 12;
 
-  pub const ALL_MARKER            : u16 = COPY_SOURCE | BEFORE_EXPR;
+  pub const ALL_MARKER            : u16 = COPY_SOURCE | BEFORE_EXPR | IS_LOOP | KEYWORD;
 
   // Space, Tab and Line Breaks
   pub const WHITE_SPACE           : u16 = 0 | COPY_SOURCE;
@@ -55,10 +56,14 @@ pub mod token_type {
 
   // Operation
   pub const ARROW                 : u16 = 30 | BEFORE_EXPR;
-  pub const QUERY                 : u16 = 31 | BEFORE_EXPR; // ?
+  pub const QUESTION              : u16 = 31 | BEFORE_EXPR; // ?
   pub const DOT                   : u16 = 32 | BEFORE_EXPR; // .
-  pub const ELIPSIS               : u16 = 33 | BEFORE_EXPR; // ...
-  pub const OPERATOR              : u16 = 39;
+  pub const QUESTION_DOT          : u16 = 33 | BEFORE_EXPR; // .
+  pub const ELIPSIS               : u16 = 34 | BEFORE_EXPR; // ...
+  pub const HASH                  : u16 = 35; // #
+  pub const AT                    : u16 = 36; // @
+  pub const OPERATOR              : u16 = 38 | BEFORE_EXPR;
+  pub const ASSIGN_OPERATOR       : u16 = 39 | BEFORE_EXPR;
   pub mod operator {
     pub const PLUS                  : u32 = 10; // +
     pub const INCRE                 : u32 = 11; // ++
@@ -82,7 +87,6 @@ pub mod token_type {
     pub const LEFT_SHIFT            : u32 = 28; // <<
     pub const RIGHT_SHIFT           : u32 = 29; // >>
     pub const U_RIGHT_SHIFT         : u32 = 30; // >>>
-    pub const HASH                  : u32 = 32; // #
     pub const STRICT_EQUAL          : u32 = 33; // ===
     pub const EQUAL                 : u32 = 34; // ==
     pub const NOT_EQUAL             : u32 = 35; // !=
@@ -96,57 +100,56 @@ pub mod token_type {
     pub const B_AND_ASSIGN          : u32 = 43; // &=
     pub const B_OR_ASSIGN           : u32 = 44; // |=
     pub const B_INVERT              : u32 = 45; // ~
-    pub const AT                    : u32 = 47; // @
   }
 
   // Keyword - Function
-  pub const FUNCTION              : u16 = 50;
-  pub const RETURN                : u16 = 51 | BEFORE_EXPR;
-  pub const ASYNC                 : u16 = 52;
-  pub const AWAIT                 : u16 = 53 | BEFORE_EXPR;
-  pub const THROW                 : u16 = 54 | BEFORE_EXPR;
-  pub const YIELD                 : u16 = 55 | BEFORE_EXPR;
+  pub const FUNCTION              : u16 = 50 | KEYWORD;
+  pub const RETURN                : u16 = 51 | KEYWORD | BEFORE_EXPR;
+  pub const ASYNC                 : u16 = 52 | KEYWORD;
+  pub const AWAIT                 : u16 = 53 | KEYWORD | BEFORE_EXPR;
+  pub const THROW                 : u16 = 54 | KEYWORD | BEFORE_EXPR;
+  pub const YIELD                 : u16 = 55 | KEYWORD | BEFORE_EXPR;
   
   // Keyword - Class
-  pub const CLASS                 : u16 = 60;
-  pub const EXTENDS               : u16 = 61 | BEFORE_EXPR;
-  pub const STATIC                : u16 = 62;
+  pub const CLASS                 : u16 = 60 | KEYWORD;
+  pub const EXTENDS               : u16 = 61 | KEYWORD | BEFORE_EXPR;
+  pub const STATIC                : u16 = 62 | KEYWORD;
 
   // Keyword - Flow Control
-  pub const IF                    : u16 = 70;
-  pub const ELSE                  : u16 = 71 | BEFORE_EXPR;
-  pub const SWITCH                : u16 = 72;
-  pub const CASE                  : u16 = 73 | BEFORE_EXPR;
-  pub const WHILE                 : u16 = 74 | IS_LOOP;
-  pub const FOR                   : u16 = 75 | IS_LOOP;
-  pub const BREAK                 : u16 = 76;
-  pub const CONTINUE              : u16 = 77;
-  pub const DO                    : u16 = 78 | BEFORE_EXPR | IS_LOOP;
-  pub const WITH                  : u16 = 79;
+  pub const IF                    : u16 = 70 | KEYWORD;
+  pub const ELSE                  : u16 = 71 | KEYWORD | BEFORE_EXPR;
+  pub const SWITCH                : u16 = 72 | KEYWORD;
+  pub const CASE                  : u16 = 73 | KEYWORD | BEFORE_EXPR;
+  pub const WHILE                 : u16 = 74 | KEYWORD | IS_LOOP;
+  pub const FOR                   : u16 = 75 | KEYWORD | IS_LOOP;
+  pub const BREAK                 : u16 = 76 | KEYWORD;
+  pub const CONTINUE              : u16 = 77 | KEYWORD;
+  pub const DO                    : u16 = 78 | KEYWORD | BEFORE_EXPR | IS_LOOP;
+  pub const WITH                  : u16 = 79 | KEYWORD;
 
   // Keyword - Variable
-  pub const VAR                   : u16 = 80;
-  pub const LET                   : u16 = 81;
-  pub const CONST                 : u16 = 82;
-  pub const TYPEOF                : u16 = 84 | BEFORE_EXPR;
-  pub const INSTANCEOF            : u16 = 85 | BEFORE_EXPR;
-  pub const IN                    : u16 = 86 | BEFORE_EXPR;
-  pub const OF                    : u16 = 87 | BEFORE_EXPR;
-  pub const NEW                   : u16 = 88 | BEFORE_EXPR;
-  pub const DELETE                : u16 = 89 | BEFORE_EXPR;
+  pub const VAR                   : u16 = 80 | KEYWORD;
+  pub const LET                   : u16 = 81 | KEYWORD;
+  pub const CONST                 : u16 = 82 | KEYWORD;
+  pub const TYPEOF                : u16 = 84 | KEYWORD | BEFORE_EXPR;
+  pub const INSTANCEOF            : u16 = 85 | KEYWORD | BEFORE_EXPR;
+  pub const IN                    : u16 = 86 | KEYWORD | BEFORE_EXPR;
+  pub const OF                    : u16 = 87 | KEYWORD | BEFORE_EXPR;
+  pub const NEW                   : u16 = 88 | KEYWORD | BEFORE_EXPR;
+  pub const DELETE                : u16 = 89 | KEYWORD | BEFORE_EXPR;
 
   // Keyword - Module
-  pub const IMPORT                : u16 = 90;
-  pub const FROM                  : u16 = 91;
-  pub const EXPORT                : u16 = 92;
-  pub const DEFAULT               : u16 = 93 | BEFORE_EXPR;
+  pub const IMPORT                : u16 = 90 | KEYWORD;
+  pub const FROM                  : u16 = 91 | KEYWORD;
+  pub const EXPORT                : u16 = 92 | KEYWORD;
+  pub const DEFAULT               : u16 = 93 | KEYWORD | BEFORE_EXPR;
 
   // Keyword - Error Handling
-  pub const TRY                   : u16 = 101;
-  pub const CATCH                 : u16 = 102;
+  pub const TRY                   : u16 = 101 | KEYWORD;
+  pub const CATCH                 : u16 = 102 | KEYWORD;
 
   // Keyword - Other
-  pub const VOID                  : u16 = 110 | BEFORE_EXPR;
+  pub const VOID                  : u16 = 110 | KEYWORD | BEFORE_EXPR;
 
   // Error
   pub const UNEXPECTED            : u16 = 0xffff;
