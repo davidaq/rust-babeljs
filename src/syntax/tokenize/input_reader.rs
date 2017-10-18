@@ -61,13 +61,17 @@ impl<'a> InputReader<'a> {
     }
   }
 
+  fn content_called_for_len (&self, len: usize) -> bool {
+    return self.tmp_commit == self.commit && self.tmp_len == len;
+  }
+
   pub fn commit (&mut self, len: usize) {
-    if self.tmp_commit != self.commit || self.tmp_len != len {
-      // content() not called, and hence no line wraping should exist
-      self.col += len;
-    } else {
+    if self.content_called_for_len(len) {
       self.col = self.tmp_col;
       self.line = self.tmp_line;
+    } else {
+      // HINT: any token containing line wrapping has varying content, no content() call no new line
+      self.col += len;
     }
     self.commit += 1;
     self.head += len;
@@ -82,7 +86,7 @@ impl<'a> InputReader<'a> {
   }
 
   pub fn content (&mut self, len: usize) -> &str {
-    if self.tmp_commit != self.commit || self.tmp_len != len {
+    if !self.content_called_for_len(len) {
       self.tmp_commit = self.commit;
       self.tmp_len = len;
       self.tmp_content.clear();

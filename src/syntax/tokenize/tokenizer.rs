@@ -22,7 +22,6 @@ impl<'a> Tokenizer<'a> {
     while !self.reader.ended() {
       let mut token_type = token_type::UNEXPECTED;
       let mut flag : u32 = 0;
-      let mut len : usize = 0;
       let mut content = Option::None;
       let start = self.reader.pos();
 
@@ -34,7 +33,7 @@ impl<'a> Tokenizer<'a> {
               Some (result) => {
                 token_type = result.0;
                 flag = result.1;
-                len = result.2;
+                let len = result.2;
                 if (token_type::COPY_SOURCE & token_type) == token_type::COPY_SOURCE {
                   content = Option::Some(String::from(self.reader.content(len)));
                 }
