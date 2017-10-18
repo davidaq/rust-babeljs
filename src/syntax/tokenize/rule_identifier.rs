@@ -28,7 +28,7 @@ pub fn all (reader: &mut InputReader) -> Option<( u16, u32, usize )> {
       },
       _ => {
         if c > '\x7f' {
-          len += c.len_utf8();
+          len += 1;
         } else {
           break;
         }
@@ -61,6 +61,8 @@ pub fn all (reader: &mut InputReader) -> Option<( u16, u32, usize )> {
       "with"      => (token_type::WITH, 0),
       "var"       => (token_type::VAR, 0),
       "let"       => (token_type::LET, 0),
+      "void"      => (token_type::VOID, 0),
+      "delete"    => (token_type::DELETE, 0),
       "const"     => (token_type::CONST, 0),
       "typeof"    => (token_type::TYPEOF, 0),
       "new"       => (token_type::NEW, 0),

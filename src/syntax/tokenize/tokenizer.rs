@@ -1,10 +1,9 @@
 use util::Queue;
+use syntax::basic_types::{ SourceLoc };
 use syntax::tokenize::*;
 use self::input_reader::InputReader;
 
 pub struct Tokenizer<'a> {
-  parse_pos: usize,
-  updated: bool,
   output: &'a Queue<Token>,
   reader: InputReader<'a>,
 }
@@ -12,8 +11,6 @@ pub struct Tokenizer<'a> {
 impl<'a> Tokenizer<'a> {
   pub fn new (input: &'a Queue<String>, output: &'a Queue<Token>) -> Self {
     let inst = Tokenizer {
-      parse_pos: 0,
-      updated: false,
       output: output,
       reader: InputReader::new(input),
     };
@@ -27,6 +24,7 @@ impl<'a> Tokenizer<'a> {
       let mut flag : u32 = 0;
       let mut len : usize = 0;
       let mut content = Option::None;
+      let start = self.reader.pos();
 
       macro_rules! match_token_rule {
         ( $rule:path ) => {
@@ -55,29 +53,29 @@ impl<'a> Tokenizer<'a> {
       match_token_rule!(rule_identifier::all);
       match_token_rule!(rule_operator::all);
 
-      let end = self.parse_pos + if token_type == token_type::UNEXPECTED {
+      if token_type == token_type::UNEXPECTED {
         content = Option::Some(String::from(self.reader.content(5)));
-        1
-      } else { len };
+        self.reader.commit(1);
+      }
       self.output.push(Token {
         token_type: token_type,
         flag: flag,
-        start: self.parse_pos,
-        end: end,
+        loc: SourceLoc {
+          start: start,
+          end: self.reader.pos(),
+        },
         content: content,
       });
       if token_type == token_type::UNEXPECTED {
         break;
-      } else {
-        if token_type != token_type::WHITE_SPACE {
-          if (token_type == token_type::IDENTIFIER || (token_type & token_type::KEYWORD) > 0) && match prev_type { token_type::QUESTION_DOT | token_type::DOT => true, _ => false } {
-            self.reader.state.expr_allowed = true;
-          } else {
-            self.reader.state.expr_allowed = (token_type & token_type::BEFORE_EXPR) > 0;
-          }
-          prev_type = token_type;
+      }
+      if token_type != token_type::WHITE_SPACE {
+        if (token_type == token_type::IDENTIFIER || (token_type & token_type::KEYWORD) > 0) && match prev_type { token_type::QUESTION_DOT | token_type::DOT => true, _ => false } {
+          self.reader.state.expr_allowed = true;
+        } else {
+          self.reader.state.expr_allowed = (token_type & token_type::BEFORE_EXPR) > 0;
         }
-        self.parse_pos += len;
+        prev_type = token_type;
       }
     }
     self.output.end();

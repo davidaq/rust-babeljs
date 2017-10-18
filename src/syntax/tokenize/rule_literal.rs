@@ -17,7 +17,7 @@ pub fn string (reader: &mut InputReader) -> Option<( u16, u32, usize )> {
           },
           _ => (),
         }
-        len += c.len_utf8();
+        len += 1;
         if escaped {
           escaped = false;
         } else if c == '\\' {

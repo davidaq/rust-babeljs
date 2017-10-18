@@ -49,7 +49,7 @@ pub fn all (reader: &mut InputReader) -> Option<( u16, u32, usize )> {
         _ => Option::Some(( token_type::OPERATOR, token_type::operator::POW, 2 )),
       },
       '=' => Option::Some(( token_type::ASSIGN_OPERATOR, token_type::operator::MULTIPLY_ASSIGN, 2 )),
-      _ => Option::Some(( token_type::OPERATOR, token_type::operator::MULTIPLY, 1 )),
+      _ => Option::Some(( token_type::OPERATOR, token_type::operator::STAR, 1 )),
     },
     '/' => match reader.next() {
       '=' => Option::Some(( token_type::ASSIGN_OPERATOR, token_type::operator::DIVIDE_ASSIGN, 2 )),

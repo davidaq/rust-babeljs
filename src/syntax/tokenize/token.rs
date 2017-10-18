@@ -1,7 +1,8 @@
+use syntax::basic_types::SourceLoc;
+
 pub struct Token {
   pub token_type: u16,
-  pub start: usize,
-  pub end: usize,
+  pub loc: SourceLoc,
 
   pub flag: u32,
 
@@ -70,7 +71,6 @@ pub mod token_type {
     pub const MINUS                 : u32 = 12; // -
     pub const DECRE                 : u32 = 13; // --
     pub const STAR                  : u32 = 14; // *
-    pub const MULTIPLY              : u32 = 14; // *
     pub const POW                   : u32 = 15; // **
     pub const DIVIDE                : u32 = 16; // /
     pub const MOD                   : u32 = 17; // %

@@ -1,4 +1,4 @@
 
-pub struct Node {
-  pub node_type: u32;
-}
+// pub struct Node {
+//   pub node_type: u32,
+// }

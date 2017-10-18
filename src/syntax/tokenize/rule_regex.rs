@@ -19,12 +19,12 @@ pub fn all (reader: &mut InputReader) -> Option<( u16, u32, usize )> {
             },
             _ => {
               escaped = false;
-              len += c.len_utf8();
+              len += 1;
             }
           }
         } else {
           let c = reader.next();
-          len += c.len_utf8();
+          len += 1;
           match c {
             '\\' => {
               escaped = true;

@@ -3,15 +3,15 @@ use syntax::tokenize::input_reader::InputReader;
 
 pub fn all (reader: &mut InputReader) -> Option<( u16, u32, usize )> {
   match reader.next() {
-    '`' => readTpl(reader, false),
+    '`' => read_tpl(reader, false),
     '}' => {
-      let isTplStr = match reader.state.brace_stack.last() {
-        Some(isTplStr) => *isTplStr,
+      let is_tplstr = match reader.state.brace_stack.last() {
+        Some(is_tplstr) => *is_tplstr,
         None => false,
       };
-      if isTplStr {
+      if is_tplstr {
         reader.state.brace_stack.pop();
-        readTpl(reader, true)
+        read_tpl(reader, true)
       } else {
         Option::None
       }
@@ -20,7 +20,7 @@ pub fn all (reader: &mut InputReader) -> Option<( u16, u32, usize )> {
   }
 }
 
-fn readTpl (reader: &mut InputReader, left_open: bool) -> Option<( u16, u32, usize )> {
+fn read_tpl (reader: &mut InputReader, left_open: bool) -> Option<( u16, u32, usize )> {
   let mut escaped = false;
   let mut len: usize = 1;
   let mut dollar = false;
@@ -29,7 +29,7 @@ fn readTpl (reader: &mut InputReader, left_open: bool) -> Option<( u16, u32, usi
     if c == '\0' {
       return Option::None;
     }
-    len += c.len_utf8();
+    len += 1;
     if escaped {
       escaped = false;
     } else {

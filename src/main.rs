@@ -15,10 +15,16 @@ fn main() {
     let token_queue = Queue::<Token>::new("token");
     crossbeam::scope(|scope| {
         scope.spawn(|| {
-            Tokenizer::new(&source_queue, &token_queue).run();
+            match env::args().nth(2) {
+                Some (out) => match &out as &str {
+                    "print_tokens" => print_tokens(&token_queue),
+                    _ => (),
+                },
+                None => Interpretor::new(&token_queue).run(),
+            };
         });
         scope.spawn(|| {
-            Interpretor::new(&token_queue).run();
+            Tokenizer::new(&source_queue, &token_queue).run();
         });
         match env::args().nth(1) {
             Some (mode) => match &mode as &str {
@@ -90,12 +96,13 @@ fn print_tokens (token_queue: &Queue<Token>) {
                     },
                     _ => {
                         let plain_token_type = !((!token.token_type) | token_type::ALL_MARKER);
+                        let loc = format!("line: {} \t col: {}", token.loc.start.line, token.loc.start.col);
                         match token.content {
                             Some (content) => {
-                                println!("token: {} content: {}", plain_token_type, content);
+                                println!("token: {} \t content: {} \t {}", plain_token_type, content, loc);
                             },
                             None => {
-                                println!("token: {} flag: {}", plain_token_type, token.flag);
+                                println!("token: {} \t flag: {} \t {}", plain_token_type, token.flag, loc);
                             },
                         }
                     },

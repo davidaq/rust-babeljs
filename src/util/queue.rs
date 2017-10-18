@@ -38,24 +38,12 @@ impl<T> Queue<T> {
     self.sem.release();
   }
 
-  pub fn interrupt (&self) {
-    let _mutex_guard = self.syn.lock();
-    for _ in 0..self.waiting.get() {
-      self.sem.release();
-    }
-  }
-
   pub fn end (&self) {
     let _mutex_guard = self.syn.lock();
     self.ended.set(true);
     for _ in 0..self.waiting.get() {
       self.sem.release();
     }
-  }
-
-  pub fn has_more (&self) -> bool {
-    let _mutex_guard = self.syn.lock();
-    return self.list.borrow().len() > 0;
   }
 
   pub fn pop (&self) -> Option<T> {

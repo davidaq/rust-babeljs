@@ -40,7 +40,7 @@ run_r () {
   RUSTFLAGS="$RUSTFLAGS -A dead_code" cargo build --release || exit 1
   runcase () {
     echo [ $1 ]
-    ./target/release/rust-babeljs.exe "$1"
+    ./target/release/rust-babeljs.exe "$1" print_tokens
     local status=$?
     if [ $status -ne 0 ]; then
       cat $1
