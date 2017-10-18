@@ -151,6 +151,7 @@ pub mod token_type {
   // Keyword - Other
   pub const VOID                  : u16 = 110 | KEYWORD | BEFORE_EXPR;
 
-  // Error
+  // Exception
   pub const UNEXPECTED            : u16 = 0xffff;
+  pub const EOF                   : u16 = 0xfffe;
 }

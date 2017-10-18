@@ -10,3 +10,18 @@ pub struct SourceLoc {
   pub start: Position,
   pub end: Position,
 }
+
+impl SourceLoc {
+  pub fn None () -> Self {
+    SourceLoc {
+      start: Position {
+        line: 0,
+        col: 0,
+      },
+      end: Position {
+        line: 0,
+        col: 0,
+      },
+    }
+  }
+}

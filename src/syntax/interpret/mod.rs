@@ -1,5 +1,5 @@
 mod interpretor;
 pub use self::interpretor::*;
 
-mod node;
-pub use self::node::*;
+pub mod node;
+pub mod node_type_id;
