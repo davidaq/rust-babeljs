@@ -1,7 +1,7 @@
 mod token;
 pub use self::token::*;
 
-mod input_reader;
+mod context;
 
 mod tokenizer;
 pub use self::tokenizer::*;

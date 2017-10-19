@@ -1,17 +1,17 @@
 use syntax::tokenize::token_type;
-use syntax::tokenize::input_reader::InputReader;
+use syntax::tokenize::context::Context;
 
-pub fn all (reader: &mut InputReader) -> Option<( u16, u32, usize )> {
-  match reader.next() {
-    '`' => read_tpl(reader, false),
+pub fn all (context: &mut Context) -> Option<( u16, u32, usize )> {
+  match context.next() {
+    '`' => read_tpl(context, false),
     '}' => {
-      let is_tplstr = match reader.state.brace_stack.last() {
+      let is_tplstr = match context.state.brace_stack.last() {
         Some(is_tplstr) => *is_tplstr,
         None => false,
       };
       if is_tplstr {
-        reader.state.brace_stack.pop();
-        read_tpl(reader, true)
+        context.state.brace_stack.pop();
+        read_tpl(context, true)
       } else {
         Option::None
       }
@@ -20,12 +20,12 @@ pub fn all (reader: &mut InputReader) -> Option<( u16, u32, usize )> {
   }
 }
 
-fn read_tpl (reader: &mut InputReader, left_open: bool) -> Option<( u16, u32, usize )> {
+fn read_tpl (context: &mut Context, left_open: bool) -> Option<( u16, u32, usize )> {
   let mut escaped = false;
   let mut len: usize = 1;
   let mut dollar = false;
   loop {
-    let c = reader.next();
+    let c = context.next();
     if c == '\0' {
       return Option::None;
     }
@@ -42,7 +42,7 @@ fn read_tpl (reader: &mut InputReader, left_open: bool) -> Option<( u16, u32, us
         },
         '{' => {
           if dollar {
-            reader.state.brace_stack.push(true);
+            context.state.brace_stack.push(true);
             return Option::Some(( (if left_open { token_type::TPL_STR_RL } else { token_type::TPL_STR_L }), 0, len ));
           }
           dollar = false;

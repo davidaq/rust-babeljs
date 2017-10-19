@@ -31,6 +31,7 @@ pub mod token_type {
   pub mod comment {
     pub const LINE                  : u32 = 0;
     pub const BLOCK                 : u32 = 1;
+    pub const HASHBANG              : u32 = 2;
   }
   // Scope Wrapping
   pub const PARENTHESIS_L         : u16 = 10 | BEFORE_EXPR;

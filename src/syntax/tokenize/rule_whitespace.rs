@@ -1,10 +1,10 @@
 use syntax::tokenize::token_type;
-use syntax::tokenize::input_reader::InputReader;
+use syntax::tokenize::context::Context;
 
-pub fn all (reader: &mut InputReader) -> Option<( u16, u32, usize )> {
+pub fn all (context: &mut Context) -> Option<( u16, u32, usize )> {
   let mut len = 0;
   loop {
-    match reader.next() {
+    match context.next() {
       ' ' | '\n' | '\r' | '\t' => {
         len += 1;
       },

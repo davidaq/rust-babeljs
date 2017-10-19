@@ -1,15 +1,15 @@
 use syntax::tokenize::token_type;
-use syntax::tokenize::input_reader::InputReader;
+use syntax::tokenize::context::Context;
 
-pub fn string (reader: &mut InputReader) -> Option<( u16, u32, usize )> {
-  let start_char = reader.next();
+pub fn string (context: &mut Context) -> Option<( u16, u32, usize )> {
+  let start_char = context.next();
   match start_char {
     '\'' | '"' => {
       let mut len = 1;
       let mut escaped = false;
       let mut flag = 0;
       loop {
-        let c = reader.next();
+        let c = context.next();
         match c {
           '\0' => return Option::None,
           '\n' | '\r' => {
@@ -32,8 +32,8 @@ pub fn string (reader: &mut InputReader) -> Option<( u16, u32, usize )> {
   }
 }
 
-pub fn number (reader: &mut InputReader) -> Option<( u16, u32, usize )> {
-  let len = number_len(reader);
+pub fn number (context: &mut Context) -> Option<( u16, u32, usize )> {
+  let len = number_len(context);
   if len > 0 {
     Option::Some(( token_type::NUMERIC_LITERAL, 0, len ))
   } else {
@@ -41,16 +41,16 @@ pub fn number (reader: &mut InputReader) -> Option<( u16, u32, usize )> {
   }
 }
 
-fn number_len (reader: &mut InputReader) -> usize {
-  match reader.next() {
+fn number_len (context: &mut Context) -> usize {
+  match context.next() {
     '0' => {
-      let (accept_zero, len) = match reader.next() {
-        'b' => (false, bin_number_len(reader)),
-        'x' => (false, hex_number_len(reader)),
-        '.' => (true, deci_number_len(reader, false, true)),
+      let (accept_zero, len) = match context.next() {
+        'b' => (false, bin_number_len(context)),
+        'x' => (false, hex_number_len(context)),
+        '.' => (true, deci_number_len(context, false, true)),
         '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' =>
-          (true, deci_number_len(reader, true, true)),
-        'e' | 'E' => (false, deci_number_len(reader, false, false)),
+          (true, deci_number_len(context, true, true)),
+        'e' | 'E' => (false, deci_number_len(context, false, false)),
         _ => (false, 0),
       };
       if !accept_zero && len == 0 {
@@ -60,19 +60,19 @@ fn number_len (reader: &mut InputReader) -> usize {
       }
     },
     '.' => {
-      1 + deci_number_len(reader, false, true)
+      1 + deci_number_len(context, false, true)
     },
     '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' => {
-      1 + deci_number_len(reader, true, true)
+      1 + deci_number_len(context, true, true)
     },
     _ => 0,
   }
 }
 
-fn bin_number_len (reader: &mut InputReader) -> usize {
+fn bin_number_len (context: &mut Context) -> usize {
   let mut len = 0;
   loop {
-    match reader.next() {
+    match context.next() {
       '0' | '1' => {
         len += 1;
       },
@@ -84,10 +84,10 @@ fn bin_number_len (reader: &mut InputReader) -> usize {
   return len;
 }
 
-fn hex_number_len (reader: &mut InputReader) -> usize {
+fn hex_number_len (context: &mut Context) -> usize {
   let mut len = 0;
   loop {
-    match reader.next() {
+    match context.next() {
       'a' | 'A' | 'b' | 'B' | 'c' | 'C' | 'd' | 'D' | 'e' | 'E' | 'f' | 'F' |
       '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' => {
         len += 1;
@@ -100,30 +100,30 @@ fn hex_number_len (reader: &mut InputReader) -> usize {
   return len;
 }
 
-fn deci_number_len (reader: &mut InputReader, accept_dot: bool, accept_exp: bool) -> usize {
+fn deci_number_len (context: &mut Context, accept_dot: bool, accept_exp: bool) -> usize {
   let mut len = 0;
   loop {
-    match reader.next() {
+    match context.next() {
       '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' => {
         len += 1;
       },
       '.' => {
         if accept_dot {
-          len += 1 + deci_number_len(reader, false, true);
+          len += 1 + deci_number_len(context, false, true);
         }
         break;
       },
       'e' | 'E' => {
         if accept_exp {
-          match reader.next() {
+          match context.next() {
             '-' => {
-              let sublen = deci_number_len(reader, false, false);
+              let sublen = deci_number_len(context, false, false);
               if sublen > 0 {
                 len += 2 + sublen;
               }
             },
             '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' => {
-              len += 2 + deci_number_len(reader, false, false);
+              len += 2 + deci_number_len(context, false, false);
             },
             _ => (),
           }

@@ -1,7 +1,38 @@
 use util::Queue;
 use syntax::basic_types::SourceLoc;
 use syntax::tokenize::{ Token, token_type };
-use super::{ node };
+use super::*;
+
+pub struct Checkpoint {
+  pos: usize,
+  dealt: bool,
+  ctx_cursor: *mut usize,
+}
+
+impl Checkpoint {
+  fn new(ctx: &mut Interpretor) -> Self {
+    Checkpoint {
+      pos: ctx.cursor,
+      dealt: false,
+      ctx_cursor: &mut ctx.cursor as *mut usize,
+    }
+  }
+
+  pub fn commit (&mut self) {
+    if self.dealt {
+      panic!("Double commitment");
+    }
+    self.dealt = true;
+  }
+}
+
+impl Drop for Checkpoint {
+  fn drop (&mut self) {
+    if !self.dealt {
+      unsafe { *self.ctx_cursor = self.pos };
+    }
+  }
+}
 
 pub struct Interpretor<'a> {
   input: &'a Queue<Token>,
@@ -30,87 +61,33 @@ impl<'a> Interpretor<'a> {
   }
 
   pub fn run (&mut self) -> Option<node::Node> {
-    let (body, directives) = self.parse_scope_body();
-    let ret = node::program(body, directives);
-    match self.input.pop() {
-      Some (..) => {
-        return None;
-      },
-      None => {
-        return Some(ret);
-      },
-    };
+    self.load_token();
+    return parse_scope::parse_program(self);
   }
 
-  fn next_token (&mut self) -> &Token {
+  fn load_token (&mut self) {
+    match self.input.pop() {
+      Some (x) => self.buffer.push(x),
+      None => self.ended = true,
+    }
+  }
+
+  pub fn next_token (&mut self) {
+    self.cursor += 1;
+    if self.cursor >= self.buffer.len() {
+      self.load_token();
+    }
+  }
+
+  pub fn cur_token (&mut self) -> &Token {
     if self.ended {
       return &self.eof;
-    }
-    if self.cursor >= self.buffer.len() {
-      match self.input.pop() {
-        Some (x) => self.buffer.push(x),
-        None => {
-          self.ended = false;
-          return &self.eof;
-        },
-      }
-    }
-    let ret = &self.buffer[self.cursor];
-    self.cursor += 1;
-    return ret;
-  }
-
-  fn stash (&mut self) {
-    self.stash.push(self.cursor);
-  }
-
-  fn commit (&mut self) {
-    self.stash.pop();
-  }
-
-  fn revert (&mut self) {
-    match self.stash.pop() {
-      Some (x) => self.cursor = x,
-      None => panic!("Unmatching interpretor stash stack"),
+    } else {
+      return &self.buffer[self.cursor];
     }
   }
 
-  fn parse_scope_body (&mut self) -> (node::NodeList, node::NodeList) {
-    let mut body: node::NodeList = vec![];
-    let mut directives: node::NodeList = vec![];
-    let mut allow_scope_directive = true;
-    loop {
-      match self.parse_statement(allow_scope_directive, true) {
-        Some (( node, is_directive )) => {
-          if is_directive {
-            directives.push(Box::new(node));
-          } else {
-            allow_scope_directive = false;
-            body.push(Box::new(node));
-          }
-        },
-        None => break,
-      }
-    };
-    return (body, directives);
-  }
-
-  fn parse_statement (&mut self, allow_scope_directive: bool, allow_module_decl: bool) -> Option<(node::Node, bool)> {
-    if allow_scope_directive {
-      self.stash();
-      { let tok = self.next_token(); }
-      self.revert();
-    }
-    if allow_module_decl {
-      match self.parse_module_decl() {
-        Some (node) => return Some(( node, false )),
-        None => (),
-      }
-    }
-    return None;
-  }
-
-  fn parse_module_decl (&mut self) -> Option<node::Node> {
-    return None;
+  pub fn checkpoint (&mut self) -> Checkpoint {
+    return Checkpoint::new(self);
   }
 }

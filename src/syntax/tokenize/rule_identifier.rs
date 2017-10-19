@@ -1,10 +1,10 @@
 use syntax::tokenize::token_type;
-use syntax::tokenize::input_reader::InputReader;
+use syntax::tokenize::context::Context;
 
-pub fn all (reader: &mut InputReader) -> Option<( u16, u32, usize )> {
+pub fn all (context: &mut Context) -> Option<( u16, u32, usize )> {
   let mut len = 0;
   loop {
-    let c = reader.next();
+    let c = context.next();
     match c {
       '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' => {
         if len == 0 {
@@ -20,7 +20,7 @@ pub fn all (reader: &mut InputReader) -> Option<( u16, u32, usize )> {
         len += 1;
       },
       '\\' => {
-        let expr_len = match_unicode_expr(reader);
+        let expr_len = match_unicode_expr(context);
         if expr_len == 0 {
           break;
         }
@@ -36,7 +36,7 @@ pub fn all (reader: &mut InputReader) -> Option<( u16, u32, usize )> {
     };
   }
   if len > 0 {
-    let (token_type, flag) = match reader.content(len) {
+    let (token_type, flag) = match context.content(len) {
       "true"      => (token_type::BOOLEAN_LITERAL, token_type::boolean::TRUE),
       "false"     => (token_type::BOOLEAN_LITERAL, token_type::boolean::FALSE),
 
@@ -86,14 +86,14 @@ pub fn all (reader: &mut InputReader) -> Option<( u16, u32, usize )> {
   }
 }
 
-fn match_unicode_expr (reader: &mut InputReader) -> usize {
-  match reader.next() {
+fn match_unicode_expr (context: &mut Context) -> usize {
+  match context.next() {
     'u' => {
-      match reader.next() {
+      match context.next() {
         '{' => {
           let mut len = 2;
           loop {
-            match reader.next() {
+            match context.next() {
               'a' | 'A' | 'b' | 'B' | 'c' | 'C' | 'd' | 'D' | 'e' | 'E' | 'f' | 'F' |
               '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' => {
                 len += 1;
@@ -111,7 +111,7 @@ fn match_unicode_expr (reader: &mut InputReader) -> usize {
         },
         '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' => {
           for _ in 0..3 {
-            match reader.next() {
+            match context.next() {
               '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' => (),
               _ => return 0,
             }

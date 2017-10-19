@@ -1,43 +1,43 @@
 use util::Queue;
 use syntax::basic_types::{ SourceLoc };
 use syntax::tokenize::*;
-use self::input_reader::InputReader;
+use self::context::Context;
 
 pub struct Tokenizer<'a> {
   output: &'a Queue<Token>,
-  reader: InputReader<'a>,
+  context: Context<'a>,
 }
 
 impl<'a> Tokenizer<'a> {
   pub fn new (input: &'a Queue<String>, output: &'a Queue<Token>) -> Self {
     let inst = Tokenizer {
       output: output,
-      reader: InputReader::new(input),
+      context: Context::new(input),
     };
     return inst;
   }
 
   pub fn run (&'a mut self) {
     let mut prev_type = token_type::UNEXPECTED;
-    while !self.reader.ended() {
+    while !self.context.ended() {
       let mut token_type = token_type::UNEXPECTED;
       let mut flag : u32 = 0;
       let mut content = Option::None;
-      let start = self.reader.pos();
+      let start = self.context.pos();
 
       macro_rules! match_token_rule {
         ( $rule:path ) => {
           if token_type == token_type::UNEXPECTED {
-            match $rule (&mut self.reader) {
-              None => self.reader.reset(),
+            match $rule (&mut self.context) {
+              None => self.context.reset(),
               Some (result) => {
                 token_type = result.0;
                 flag = result.1;
                 let len = result.2;
                 if (token_type::COPY_SOURCE & token_type) == token_type::COPY_SOURCE {
-                  content = Option::Some(String::from(self.reader.content(len)));
+                  content = Option::Some(String::from(self.context.content(len)));
                 }
-                self.reader.commit(len);
+                self.context.commit(len);
               },
             }
           };
@@ -53,15 +53,15 @@ impl<'a> Tokenizer<'a> {
       match_token_rule!(rule_operator::all);
 
       if token_type == token_type::UNEXPECTED {
-        content = Option::Some(String::from(self.reader.content(5)));
-        self.reader.commit(1);
+        content = Option::Some(String::from(self.context.content(5)));
+        self.context.commit(1);
       }
       self.output.push(Token {
         token_type: token_type,
         flag: flag,
         loc: SourceLoc {
           start: start,
-          end: self.reader.pos(),
+          end: self.context.pos(),
         },
         content: content,
       });
@@ -70,9 +70,9 @@ impl<'a> Tokenizer<'a> {
       }
       if token_type != token_type::WHITE_SPACE {
         if (token_type == token_type::IDENTIFIER || (token_type & token_type::KEYWORD) > 0) && match prev_type { token_type::QUESTION_DOT | token_type::DOT => true, _ => false } {
-          self.reader.state.expr_allowed = true;
+          self.context.state.expr_allowed = true;
         } else {
-          self.reader.state.expr_allowed = (token_type & token_type::BEFORE_EXPR) > 0;
+          self.context.state.expr_allowed = (token_type & token_type::BEFORE_EXPR) > 0;
         }
         prev_type = token_type;
       }

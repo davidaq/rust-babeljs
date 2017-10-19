@@ -15,7 +15,7 @@ impl State {
   }
 }
 
-pub struct InputReader<'a> {
+pub struct Context<'a> {
   pub state: State,
   input: &'a Queue<String>,
   buffer: Vec<char>,
@@ -33,9 +33,9 @@ pub struct InputReader<'a> {
   tmp_content: String,
 }
 
-impl<'a> InputReader<'a> {
+impl<'a> Context<'a> {
   pub fn new (input: &'a Queue<String>) -> Self {
-    InputReader {
+    Context {
       state: State::new(),
       input: input,
       buffer: vec![],
@@ -52,6 +52,10 @@ impl<'a> InputReader<'a> {
       tmp_col: 1,
       tmp_content: String::with_capacity(100),
     }
+  }
+
+  pub fn allow_hashbang (&self) -> bool {
+    return self.commit == 0;
   }
 
   pub fn pos (&self) -> Position {

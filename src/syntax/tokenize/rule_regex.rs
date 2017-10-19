@@ -1,18 +1,18 @@
 use syntax::tokenize::token_type;
-use syntax::tokenize::input_reader::InputReader;
+use syntax::tokenize::context::Context;
 
 // Must placed after comment, interpretor detect following identifier as regex flags
-pub fn all (reader: &mut InputReader) -> Option<( u16, u32, usize )> {
-  if !reader.state.expr_allowed {
+pub fn all (context: &mut Context) -> Option<( u16, u32, usize )> {
+  if !context.state.expr_allowed {
     return Option::None;
   }
-  match reader.next() {
+  match context.next() {
     '/' => {
       let mut len = 1;
       let mut escaped = false;
       loop {
         if escaped {
-          let c = reader.next();
+          let c = context.next();
           match c {
             '\0' | '\n' | '\r' => {
               return Option::None;
@@ -23,7 +23,7 @@ pub fn all (reader: &mut InputReader) -> Option<( u16, u32, usize )> {
             }
           }
         } else {
-          let c = reader.next();
+          let c = context.next();
           len += 1;
           match c {
             '\\' => {
