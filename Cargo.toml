@@ -3,18 +3,7 @@ name = "rust-babeljs"
 version = "0.1.0"
 authors = ["DavidAQ <153019747@qq.com>"]
 
-[dependencies.crossbeam]
-git = "https://github.com/crossbeam-rs/crossbeam"
-tag = "0.3.0"
-
-[dependencies.std-semaphore]
-git = "https://github.com/invenia/std-semaphore"
-rev = "e3fc0de"
-
-[dependencies.syn]
-git = "https://github.com/dtolnay/syn"
-tag = "0.11.11"
-
-[dependencies.quote]
-git = "https://github.com/dtolnay/quote"
-tag = "0.3.15"
+[dependencies]
+crossbeam       = "0.3.0"
+std-semaphore   = { git = "https://github.com/invenia/std-semaphore",   rev = "e3fc0de" }
+derives         = { path = "derives" }

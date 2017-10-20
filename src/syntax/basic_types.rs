@@ -12,7 +12,7 @@ pub struct SourceLoc {
 }
 
 impl SourceLoc {
-  pub fn None () -> Self {
+  pub fn new () -> Self {
     SourceLoc {
       start: Position {
         line: 0,

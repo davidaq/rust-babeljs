@@ -1,7 +1,8 @@
 use syntax::tokenize::{ Token, token_type };
 use super::{ Interpretor, node, node_type_id };
+use super::node::INode;
 
-pub fn parse (context: &mut Interpretor) -> Option<node::Node> {
+pub fn parse (context: &mut Interpretor) -> node::NodeBox {
   match context.cur_token().token_type {
     token_type::BREAK | token_type::CONTINUE => {
       return parse_break_continue(context);
@@ -14,12 +15,11 @@ pub fn parse (context: &mut Interpretor) -> Option<node::Node> {
   return None;
 }
 
-fn parse_break_continue (context: &mut Interpretor) -> Option<node::Node> {
+fn parse_break_continue (context: &mut Interpretor) -> node::NodeBox {
   let is_break = context.cur_token().token_type == token_type::BREAK;
-  
-  return 
+  return None;
 }
 
-fn parse_module_decl (context: &mut Interpretor) -> Option<node::Node> {
+fn parse_module_decl (context: &mut Interpretor) -> node::NodeBox {
   return None;
 }

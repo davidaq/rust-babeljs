@@ -54,13 +54,13 @@ impl<'a> Interpretor<'a> {
         token_type: token_type::EOF,
         flag: 0,
         content: None,
-        loc: SourceLoc::None(),
+        loc: SourceLoc::new(),
       },
       ended: false,
     }
   }
 
-  pub fn run (&mut self) -> Option<node::Node> {
+  pub fn run (&mut self) -> node::NodeBox {
     self.load_token();
     return parse_scope::parse_program(self);
   }

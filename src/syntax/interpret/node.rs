@@ -1,51 +1,43 @@
 use syntax::basic_types::SourceLoc;
 use super::node_type_id::*;
+use std::any::Any;
 
-pub type NodeList = Vec<Box<Node>>;
-
-pub struct Node {
-  pub node_type: u32,
-  pub loc: Option<SourceLoc>,
-  pub body: Option<NodeList>,
-  pub directives: Option<NodeList>,
-  pub node_value: Option<Box<Node>>,
-  pub str_value: Option<String>,
-  pub expression: Option<Box<Node>>,
+pub type NodeList = Vec<NodeBox>;
+pub struct NodeBox {
+  pub val: Option<Box<INode>>,
 }
-
-pub fn node (type_id: u32) -> Node {
-  Node {
-    node_type: type_id,
-    loc: None,
-    body: None,
-    directives: None,
-    node_value: None,
-    str_value: None,
-    expression: None,
+impl NodeBox {
+  pub fn is_none () -> bool {
+    match self.val {
+      Some (x) => false,
+      None => true,
+    }
   }
 }
 
-pub fn program (body: NodeList, directives: NodeList) -> Node {
-  let mut node = node(PROGRAM);
-  node.body = Some(body);
-  node.directives = Some(directives);
-  return node;
+pub trait INode {
+  fn loc (&self) -> &SourceLoc;
+  fn type_id (&self) -> u32;
+  fn type_name (&self) -> &'static str;
+  fn as_any (&self) -> &Any;
+  fn as_any_mut (&mut self) -> &mut Any;
 }
 
-pub fn expression_statement (expression: Node) -> Node {
-  let mut node = node(EXPRESSION_STMT);
-  node.expression = Some(Box::new(expression));
-  return node;
+macro_rules! node_type {
+  ($name:ident {
+    $($field_name:ident: $field_type:ty,)*
+  }) => {
+    #[derive(INode)]
+    pub struct $name {
+      pub loc: SourceLoc,
+      $(pub $field_name: $field_type,)*
+    }
+  }
 }
 
-pub fn literal (node_type: u32, value: String) -> Node {
-  let mut node = node(node_type);
-  node.str_value = Some(value);
-  return node;
-}
-
-pub fn directive (value: String) -> Node {
-  let mut node = node(DIRECTIVE);
-  node.node_value = Some(Box::new(literal(DIRECTIVE_LITERAL, value)));
-  return node;
+node_type! {
+  Program {
+    body: NodeList,
+    directives: NodeList,
+  }
 }
