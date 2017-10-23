@@ -1,12 +1,27 @@
 use syn;
 use quote;
 use proc_macro::TokenStream;
+use std::sync::{ Once, ONCE_INIT };
+use std::mem;
+
 
 fn gen_type_id () -> u32 {
   static mut COUNTER: u32 = 0;
   unsafe {
     COUNTER += 1;
     return COUNTER;
+  }
+}
+
+fn type_names<T> (cb: T) where T: FnOnce(&mut Vec<String>) {
+  static mut INST: *mut Vec<String> = 0 as *mut Vec<String>;
+  static ONCE: Once = ONCE_INIT;
+  unsafe {
+    ONCE.call_once(|| {
+      let inst: Vec<String> = vec![];
+      INST = mem::transmute(Box::new(inst));
+    });
+    cb(&mut *INST);
   }
 }
 
@@ -17,15 +32,20 @@ pub fn derive_node (input: TokenStream) -> TokenStream {
   let type_name = name.to_string();
   match ast.body {
     syn::Body::Enum (_) => {
-      return (match &type_name as &str {
+      let ret: TokenStream = (match &type_name as &str {
         "NodeDefintionBegin" => prepare_derive_node(),
         "NodeDefintionEnd" => process_derive_node(),
         _ => quote! {},
-      }).parse().unwrap()
+      }).parse().unwrap();
+      // println!("{}", ret.to_string());
+      return ret;
     },
     _ => (),
   };
   let type_id = gen_type_id();
+  type_names(|list| {
+    list.push(type_name.clone());
+  });
   let expanded = quote! {
     impl #name {
       pub fn is_typeof<T: INode> (inst: &T) -> bool {
@@ -92,7 +112,7 @@ pub fn prepare_derive_node () -> quote::Tokens {
 
     macro_rules! node_type_base {
       ($name:ident {
-        $($field_name:ident : $field_type:ty = $def_val:expr;)*
+        $($field_name:ident : $field_type:ty = $def_val:expr)*
       }) => {
         #[derive(INode)]
         pub struct $name {
@@ -111,11 +131,11 @@ pub fn prepare_derive_node () -> quote::Tokens {
     }
 
     macro_rules! node_type {
-      ($name:ident < $($flag:ident)|* {
-        $($field_name:ident: $field_type:ty = $def_val:expr;)*
+      ($name:ident <: $($flag:ident),* {
+        $($field_name:ident: $field_type:ty = $def_val:expr)*
       }) => {
         node_type_base!($name {
-          $($field_name : $field_type = $def_val;)*
+          $($field_name : $field_type = $def_val)*
         });
         impl IFlagged for $name {
           fn has_flag_ (&self, flag: Flag) -> bool {
@@ -127,10 +147,10 @@ pub fn prepare_derive_node () -> quote::Tokens {
         }
       };
       ($name:ident {
-        $($field_name:ident : $field_type:ty = $def_val:expr;)*
+        $($field_name:ident : $field_type:ty = $def_val:expr)*
       }) => {
         node_type_base!($name {
-          $($field_name : $field_type = $def_val;)*
+          $($field_name : $field_type = $def_val)*
         });
         impl IFlagged for $name {
           fn has_flag_ (&self, flag: Flag) -> bool {
@@ -145,6 +165,18 @@ pub fn prepare_derive_node () -> quote::Tokens {
 }
 
 pub fn process_derive_node () -> quote::Tokens {
+  let mut names: Vec<quote::Tokens> = vec![];
+  type_names(|list| {
+    for i in 0..list.len() {
+      let name = syn::Ident::from(list[i].clone());
+      names.push(quote! {
+        #name,
+      });
+    }
+  });
   quote! {
+    enum Flag {
+      #(#names)*
+    }
   }
 }

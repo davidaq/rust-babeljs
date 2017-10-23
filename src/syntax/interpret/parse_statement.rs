@@ -16,7 +16,7 @@ pub fn parse (context: &mut Interpretor) -> node::NodeBox {
 }
 
 fn parse_break_continue (context: &mut Interpretor) -> node::NodeBox {
-  unimplemented!();
+  return node::BreakStatement::new().to_box();
 }
 
 fn parse_module_decl (context: &mut Interpretor) -> node::NodeBox {
