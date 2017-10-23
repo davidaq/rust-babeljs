@@ -16,10 +16,9 @@ pub fn parse (context: &mut Interpretor) -> node::NodeBox {
 }
 
 fn parse_break_continue (context: &mut Interpretor) -> node::NodeBox {
-  let is_break = context.cur_token().token_type == token_type::BREAK;
-  return None;
+  unimplemented!();
 }
 
 fn parse_module_decl (context: &mut Interpretor) -> node::NodeBox {
-  return None;
+  unimplemented!();
 }

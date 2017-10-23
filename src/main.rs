@@ -2,7 +2,7 @@ extern crate crossbeam;
 extern crate std_semaphore;
 
 #[macro_use]
-extern crate derives;
+extern crate macross;
 
 mod syntax;
 mod util;

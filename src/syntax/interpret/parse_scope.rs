@@ -1,13 +1,14 @@
 use syntax::tokenize::{ Token, token_type };
 use super::*;
+use super::node::{ NodeBox };
 
-pub fn parse_program (context: &mut Interpretor) -> node::NodeBox {
+pub fn parse_program (context: &mut Interpretor) -> NodeBox {
   let mut program = node::Program::new();
   parse_body(context, &mut program.body, &mut program.directives);
   return program.to_box();
 }
 
-pub fn parse_body (context: &mut Interpretor, body: &mut node::NodeList, directives: &mut node::NodeList) {
+pub fn parse_body (context: &mut Interpretor, body: &mut Vec<NodeBox>, directives: &mut Vec<NodeBox>) {
   // let mut body: node::NodeList = vec![];
   // let mut directives: node::NodeList = vec![];
   // let mut allow_scope_directive = true;
