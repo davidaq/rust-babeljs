@@ -1,7 +1,6 @@
 use std::cell::{ Cell, RefCell };
 use std::collections::VecDeque;
 use std::sync::Mutex;
-use std_semaphore::Semaphore;
 use std::marker::{ Sync, Send };
 
 pub struct Queue<T> {
@@ -9,7 +8,6 @@ pub struct Queue<T> {
   list: RefCell<VecDeque<T>>,
   waiting: Cell<usize>,
   syn: Mutex<u8>,
-  sem: Semaphore,
   name: String,
 }
 
@@ -21,7 +19,6 @@ impl<T> Queue<T> {
   pub fn new (name: &str) -> Self {
     Queue::<T> {
       syn: Mutex::new(0),
-      sem: Semaphore::new(0),
       waiting: Cell::new(0),
       ended: Cell::new(false),
       list: RefCell::new(VecDeque::with_capacity(20)),
@@ -35,15 +32,11 @@ impl<T> Queue<T> {
       panic!("Ended queue \"{}\" is read only!", self.name);
     }
     self.list.borrow_mut().push_back(item);
-    self.sem.release();
   }
 
   pub fn end (&self) {
     let _mutex_guard = self.syn.lock();
     self.ended.set(true);
-    for _ in 0..self.waiting.get() {
-      self.sem.release();
-    }
   }
 
   pub fn pop (&self) -> Option<T> {
@@ -56,7 +49,6 @@ impl<T> Queue<T> {
       }
     }
     if !ended {
-      self.sem.acquire();
     }
     let _mutex_guard = self.syn.lock();
     if !ended {

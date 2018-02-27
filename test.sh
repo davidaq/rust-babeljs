@@ -1,5 +1,3 @@
-pushd `dirname $0`
-
 TEST_CASE_DIR=`pwd`/test-case
 FETCH_TMP_DIR=tmp-test-fetch
 
@@ -20,11 +18,16 @@ fetch () {
   rm -rf $FETCH_TMP_DIR
 }
 
+debug () {
+  RUSTFLAGS="$RUSTFLAGS -A dead_code" cargo build || exit 1
+  ./target/debug/rust-babeljs debug print_tokens
+}
+
 run () {
   RUSTFLAGS="$RUSTFLAGS -A dead_code" cargo build || exit 1
   runcase () {
     echo [ $1 ]
-    ./target/debug/rust-babeljs.exe "$1"
+    ./target/debug/rust-babeljs "$1"
     local status=$?
     if [ $status -ne 0 ]; then
       cat $1
@@ -40,7 +43,7 @@ run_r () {
   RUSTFLAGS="$RUSTFLAGS -A dead_code" cargo build --release || exit 1
   runcase () {
     echo [ $1 ]
-    ./target/release/rust-babeljs.exe "$1" print_tokens
+    ./target/release/rust-babeljs "$1" print_tokens
     local status=$?
     if [ $status -ne 0 ]; then
       cat $1

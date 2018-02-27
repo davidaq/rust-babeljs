@@ -3,7 +3,3 @@ name = "rust-babeljs"
 version = "0.1.0"
 authors = ["DavidAQ <153019747@qq.com>"]
 
-[dependencies]
-crossbeam       = "0.3.0"
-std-semaphore   = { git = "https://github.com/invenia/std-semaphore",   rev = "e3fc0de" }
-macross         = { path = "macross" }

@@ -1,4 +1,5 @@
 /target/
+/text-case/
 **/*.rs.bk
 .*
 !.gitignore
