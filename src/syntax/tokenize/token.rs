@@ -1,5 +1,9 @@
 use syntax::basic_types::SourceLoc;
 
+pub struct Token2<'a> {
+  pub content: &'a str,
+}
+
 pub struct Token {
   pub token_type: u16,
   pub loc: SourceLoc,
@@ -10,6 +14,7 @@ pub struct Token {
 }
 
 pub mod token_type {
+
   // MARKER
   pub const COPY_SOURCE           : u16 = 1 << 15;
   pub const BEFORE_EXPR           : u16 = 1 << 14;

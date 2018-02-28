@@ -1,3 +1,7 @@
+#!/bin/bash
+
+source ./env.sh
+
 TEST_CASE_DIR=`pwd`/test-case
 FETCH_TMP_DIR=tmp-test-fetch
 

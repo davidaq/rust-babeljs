@@ -1,57 +1,39 @@
 use std::{ env, process, io, fs };
 use std::io::BufRead;
+use syntax::context::Context;
 use syntax::tokenize::{ Token, Tokenizer, token_type };
 //use syntax::interpret::{ Interpretor };
+use syntax::tokenize::token_type2;
 use util::Queue;
 
 pub fn main() {
+  println!("{} {}", token_type2::LINE_COMMENT.id, token_type2::LINE_COMMENT.flag);
+  println!("{}", token_type2::LINE_COMMENT == token_type2::LINE_COMMENT);
+  let mut context = Context::new();
   let source_queue = Queue::<String>::new("source");
   let token_queue = Queue::<Token>::new("token");
 
   match env::args().nth(1) {
     Some (mode) => match &mode as &str {
       "debug" => {
-        source_queue.push(String::from("`42`"));
-        source_queue.end();
-      },
-      "pipe" => {
-        let stdin = io::stdin();
-        let mut input = stdin.lock();
-        loop {
-          let mut line = String::new();
-          match input.read_line(&mut line) {
-            Ok (size) => {
-              if size == 0 {
-                break;
-              }
-              source_queue.push(line);
-            },
-            Err (..) => break,
-          }
-        }
-        source_queue.end();
-      },
-      "ipc" => {
-        println!("IPC not implemented");
-        process::exit(1);
+        context.append_source("`42`");
       },
       _ => {
         let filename = &mode;
         let filein = fs::File::open(filename).expect("File not found");
         let mut input = io::BufReader::new(filein);
+        let mut line = String::new();
         loop {
-          let mut line = String::new();
           match input.read_line(&mut line) {
             Ok (size) => {
               if size == 0 {
                 break;
               }
-              source_queue.push(line);
+              context.append_source(&line);
             },
             Err (..) => break,
           }
         }
-        source_queue.end();
       },
     },
     None => {
@@ -60,18 +42,19 @@ pub fn main() {
       process::exit(1);
     },
   }
+  Tokenizer::tokenize(&mut context);
   
-  Tokenizer::new(&source_queue, &token_queue).run();
+  //Tokenizer::new(&source_queue, &token_queue).run();
 
-  match env::args().nth(2) {
-    Some (out) => match &out as &str {
-      "print_tokens" => print_tokens(&token_queue),
-      _ => (),
-    },
-    None => {
-      //Interpretor::new(&token_queue).run();
-    },
-  };
+  //match env::args().nth(2) {
+  //  Some (out) => match &out as &str {
+  //    "print_tokens" => print_tokens(&token_queue),
+  //    _ => (),
+  //  },
+  //  None => {
+  //    //Interpretor::new(&token_queue).run();
+  //  },
+  //};
 
 }
 
