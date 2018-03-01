@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source ./env.sh
+source `dirname $0`/env.sh
 
 TEST_CASE_DIR=`pwd`/test-case
 FETCH_TMP_DIR=tmp-test-fetch
@@ -23,12 +23,12 @@ fetch () {
 }
 
 debug () {
-  RUSTFLAGS="$RUSTFLAGS -A dead_code" cargo build || exit 1
+  cargo build || exit 1
   ./target/debug/rust-babeljs debug print_tokens
 }
 
 run () {
-  RUSTFLAGS="$RUSTFLAGS -A dead_code" cargo build || exit 1
+  cargo build || exit 1
   runcase () {
     echo [ $1 ]
     ./target/debug/rust-babeljs "$1"
