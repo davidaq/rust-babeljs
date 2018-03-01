@@ -2,7 +2,6 @@ use std::str::Chars;
 use util::Queue;
 use syntax::basic_types::{ SourceLoc };
 use syntax::tokenize::*;
-//use self::context::Context;
 use syntax::context::Context;
 
 struct State {
@@ -69,7 +68,7 @@ impl<'a> Tokenizer<'a> {
   fn reset (&mut self) {
   }
 
-  fn next (&mut self) -> char {
+  pub fn next (&mut self) -> char {
     self.cursor += 1;
     match self.source_chars.nth(self.cursor) {
       Some (c) => c,
@@ -78,10 +77,24 @@ impl<'a> Tokenizer<'a> {
   }
 
   fn run (&mut self) {
-    let mut prev_type = token_type::UNEXPECTED;
+    let mut prev_type = tt::UNEXPECTED;
 
     while !self.ended {
-      let mut token_type = token_type::UNEXPECTED;
+      let mut token_type = tt::UNEXPECTED;
+      let start = self.cursor;
+      macro_rules! match_token_rule {
+        ( $rule:ident ) => {
+          if token_type == tt::UNEXPECTED {
+            match $rule::try(self) {
+              None => self.reset(),
+              Some (result) => {
+                println!("{}", tt::stringify(result.0).unwrap())
+              }
+            }
+          }
+        }
+      }
+      match_token_rule!(rule_whitespace);
       break
       // let mut content = Option::None;
       // let start = self.context.pos();

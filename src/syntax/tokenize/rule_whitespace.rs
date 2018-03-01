@@ -1,7 +1,7 @@
-use syntax::tokenize::token_type;
-use syntax::tokenize::context::Context;
+use syntax::tokenize::tt;
+use syntax::tokenize::Tokenizer;
 
-pub fn all (context: &mut Context) -> Option<( u16, u32, usize )> {
+pub fn try (context: &mut Tokenizer) -> Option<( tt::TokenType, usize )> {
   let mut len = 0;
   loop {
     match context.next() {
@@ -14,7 +14,7 @@ pub fn all (context: &mut Context) -> Option<( u16, u32, usize )> {
     };
   }
   if len > 0 {
-    return Option::Some((token_type::WHITE_SPACE, 0, len));
+    return Option::Some((tt::WHITE_SPACE, len));
   }
   return Option::None;
 }

@@ -4,23 +4,17 @@ pub use self::token::*;
 mod context;
 
 pub mod tt {
-  pub struct TokenType {
-    pub id: u32,
-    pub flag: u32,
-  }
- 
+  pub type Flag = usize;
+  pub type TokenType = usize;
+
   include!(concat!(env!("OUT_DIR"), "/token_type.rs"));
 
-  impl PartialEq for TokenType {
-    fn eq (&self, other: &Self) -> bool {
-      self.id == other.id
-    }
+  pub fn stringify (ty: TokenType) -> Option<&'static str> {
+    TOK_STRING[ty]
   }
-  
-  impl TokenType {
-    pub fn stringify (&self) -> Option<&'static str> {
-      stringify(self.id)
-    }
+
+  pub fn type_is (ty: TokenType, flag: Flag) -> bool {
+    TOK_FLAG[ty] & flag != 0
   }
 }
 

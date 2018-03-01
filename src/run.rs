@@ -6,17 +6,14 @@ use syntax::tokenize::{ Token, Tokenizer, token_type };
 use syntax::tokenize::tt;
 use util::Queue;
 
-pub fn main() {
-  println!("{}", tt::ARROW.stringify().unwrap());
-  println!("{}", tt::LINE_COMMENT == tt::LINE_COMMENT);
+pub fn main () {
+  println!("{}", tt::stringify(tt::TRY).unwrap());
   let mut context = Context::new();
-  let source_queue = Queue::<String>::new("source");
-  let token_queue = Queue::<Token>::new("token");
 
   match env::args().nth(1) {
     Some (mode) => match &mode as &str {
       "debug" => {
-        context.append_source("`42`");
+        context.append_source("  `42`");
       },
       _ => {
         let filename = &mode;
@@ -58,34 +55,3 @@ pub fn main() {
 
 }
 
-fn print_tokens (token_queue: &Queue<Token>) {
-  loop {
-    match token_queue.pop() {
-      Some(token) => {
-        match token.token_type {
-          token_type::UNEXPECTED => match token.content {
-            Some (content) => {
-              panic!("Unexpected: {}", content);
-            },
-            None => {
-              panic!("Unexpected");
-            },
-          },
-          _ => {
-            let plain_token_type = !((!token.token_type) | token_type::ALL_MARKER);
-            let loc = format!("line: {} \t col: {}", token.loc.start.line, token.loc.start.col);
-            match token.content {
-              Some (content) => {
-                println!("token: {} \t content: {} \t {}", plain_token_type, content, loc);
-              },
-              None => {
-                println!("token: {} \t flag: {} \t {}", plain_token_type, token.flag, loc);
-              },
-            }
-          },
-        };
-      },
-      None => break,
-    }
-  }
-}

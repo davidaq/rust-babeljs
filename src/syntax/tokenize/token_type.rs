@@ -6,12 +6,10 @@
   def!(flag BEFORE_EXPR);
   def!(flag IS_LOOP);
   def!(flag KEYWORD);
+  def!(flag RESERVED);
   def!(flag LITERAL);
   def!(flag OPERATOR);
   def!(flag ASSIGN_OPERATOR);
-
-  // Space, Tab and Line Breaks
-  def!(token WHITE_SPACE);
 
   // Seperation
   def!(token COLON      = :     <: BEFORE_EXPR);
@@ -37,6 +35,7 @@
   def!(token STRING_LITERAL       <: LITERAL);
   def!(token NUMERIC_LITERAL      <: LITERAL);
   def!(token BOOLEAN_LITERAL      <: LITERAL);
+  def!(token VOID    = void       <: KEYWORD | RESERVED | BEFORE_EXPR);
   def!(token TPL_STRING);
   def!(token TPL_STRING_L         <: BEFORE_EXPR);
   def!(token TPL_STRING_R);
@@ -83,5 +82,55 @@
   def!(token OP_BIT_AND_ASSIGN   = &=     <: OPERATOR | ASSIGN_OPERATOR | BEFORE_EXPR);
   def!(token OP_BIT_OR_ASSIGN    = |=     <: OPERATOR | ASSIGN_OPERATOR | BEFORE_EXPR);
 
+  // Keyword - Function
+  def!(token FUNCTION            = function   <: KEYWORD | RESERVED);
+  def!(token RETURN              = return     <: KEYWORD | RESERVED | BEFORE_EXPR);
+  def!(token ASYNC               = async      <: KEYWORD);
+  def!(token AWAIT               = await      <: KEYWORD | BEFORE_EXPR);
+  def!(token YIELD               = throw      <: KEYWORD | BEFORE_EXPR);
+
+  // Keyword - Class
+  def!(token CLASS               = class      <: KEYWORD | RESERVED);
+  def!(token EXTENDS             = extends    <: KEYWORD | RESERVED | BEFORE_EXPR);
+  def!(token STATIC              = static     <: KEYWORD);
+
+  // Keyword - Flow Control
+  def!(token IF                  = if         <: KEYWORD | RESERVED);
+  def!(token ELSE                = else       <: KEYWORD | RESERVED | BEFORE_EXPR);
+  def!(token SWITCH              = switch     <: KEYWORD | RESERVED);
+  def!(token CASE                = case       <: KEYWORD | RESERVED | BEFORE_EXPR);
+  def!(token WHILE               = while      <: KEYWORD | RESERVED | IS_LOOP);
+  def!(token FOR                 = for        <: KEYWORD | RESERVED | IS_LOOP);
+  def!(token BREAK               = break      <: KEYWORD | RESERVED);
+  def!(token CONTINUE            = continue   <: KEYWORD | RESERVED);
+  def!(token DO                  = do         <: KEYWORD | RESERVED | BEFORE_EXPR | IS_LOOP);
+  def!(token WITH                = with       <: KEYWORD | RESERVED);
+
+  // Keyword - Variable 
+  def!(token VAR                 = var        <: KEYWORD | RESERVED);
+  def!(token LET                 = let        <: KEYWORD);
+  def!(token CONST               = const      <: KEYWORD | RESERVED);
+  def!(token TYPEOF              = typeof     <: KEYWORD | RESERVED | BEFORE_EXPR);
+  def!(token INSTANCEOF          = instanceof <: KEYWORD | RESERVED | BEFORE_EXPR);
+  def!(token IN                  = in         <: KEYWORD | RESERVED | BEFORE_EXPR);
+  def!(token OF                  = of         <: KEYWORD | BEFORE_EXPR);
+  def!(token NEW                 = new        <: KEYWORD | RESERVED | BEFORE_EXPR);
+  def!(token DELETE              = delete     <: KEYWORD | RESERVED | BEFORE_EXPR);
+
+  // Keyword - Module
+  def!(token IMPORT              = import     <: KEYWORD | RESERVED);
+  def!(token FROM                = from       <: KEYWORD);
+  def!(token EXPORT              = export     <: KEYWORD);
+  def!(token DEFAULT             = default    <: KEYWORD | BEFORE_EXPR);
+  
+  // Keyword - Error Handling
+  def!(token TRY                 = try        <: KEYWORD | RESERVED);
+  def!(token CATCH               = catch      <: KEYWORD | RESERVED);
+  def!(token THROW               = throw      <: KEYWORD | RESERVED | BEFORE_EXPR);
+
+  // Keyword - Other
+  def!(token WHITE_SPACE);
+  def!(token UNEXPECTED         := "");
+  def!(token EOF                := "");
 }
 
