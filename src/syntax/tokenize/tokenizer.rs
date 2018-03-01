@@ -69,11 +69,33 @@ impl<'a> Tokenizer<'a> {
   }
 
   pub fn next (&mut self) -> char {
-    self.cursor += 1;
     match self.source_chars.nth(self.cursor) {
-      Some (c) => c,
+      Some (c) => {
+        self.cursor += 1;
+        c
+      },
       None => '\0',
     }
+  }
+
+  fn try_rules (&mut self) {
+    macro_rules! match_token_rule {
+      ( $rule:ident ) => {
+        match $rule::try(self) {
+          None => self.reset(),
+          Some (result) => {
+            match tt::stringify(result.0) {
+              Some (s) => println!("{}", s),
+              None => {
+                println!("*vary* {}", result.1);
+              },
+            }
+            return
+          }
+        }
+      }
+    }
+    match_token_rule!(rule_whitespace);
   }
 
   fn run (&mut self) {
@@ -82,19 +104,8 @@ impl<'a> Tokenizer<'a> {
     while !self.ended {
       let mut token_type = tt::UNEXPECTED;
       let start = self.cursor;
-      macro_rules! match_token_rule {
-        ( $rule:ident ) => {
-          if token_type == tt::UNEXPECTED {
-            match $rule::try(self) {
-              None => self.reset(),
-              Some (result) => {
-                println!("{}", tt::stringify(result.0).unwrap())
-              }
-            }
-          }
-        }
-      }
-      match_token_rule!(rule_whitespace);
+      self.try_rules();
+      println!("ATEMPT");
       break
       // let mut content = Option::None;
       // let start = self.context.pos();
