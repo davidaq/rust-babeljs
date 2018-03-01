@@ -10,6 +10,10 @@ fetch () {
   mkdir -p $FETCH_TMP_DIR
   pushd $FETCH_TMP_DIR
   curl 'https://codeload.github.com/babel/babylon/zip/master' > ./master.zip
+  UNZIP_EXISTS=`which unzip`
+  if [ -z "$UNZIP_EXISTS" ]; then
+    apt-get install unzip
+  fi
   unzip master.zip
   cd babylon-master/test
   mvtest () {
