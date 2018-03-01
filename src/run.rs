@@ -3,12 +3,12 @@ use std::io::BufRead;
 use syntax::context::Context;
 use syntax::tokenize::{ Token, Tokenizer, token_type };
 //use syntax::interpret::{ Interpretor };
-use syntax::tokenize::token_type2;
+use syntax::tokenize::tt;
 use util::Queue;
 
 pub fn main() {
-  println!("{} {}", token_type2::LINE_COMMENT.id, token_type2::LINE_COMMENT.flag);
-  println!("{}", token_type2::LINE_COMMENT == token_type2::LINE_COMMENT);
+  println!("{}", tt::ARROW.stringify().unwrap());
+  println!("{}", tt::LINE_COMMENT == tt::LINE_COMMENT);
   let mut context = Context::new();
   let source_queue = Queue::<String>::new("source");
   let token_queue = Queue::<Token>::new("token");

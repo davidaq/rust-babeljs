@@ -3,8 +3,85 @@
 
 {
   def!(flag COMMENT);
+  def!(flag BEFORE_EXPR);
+  def!(flag IS_LOOP);
+  def!(flag KEYWORD);
+  def!(flag LITERAL);
+  def!(flag OPERATOR);
+  def!(flag ASSIGN_OPERATOR);
 
+  // Space, Tab and Line Breaks
   def!(token WHITE_SPACE);
-  def!(token LINE_COMMENT <: COMMENT);
+
+  // Seperation
+  def!(token COLON      = :     <: BEFORE_EXPR);
+  def!(token SEMI_COLON = ;     <: BEFORE_EXPR);
+  def!(token COMMA      = ,     <: BEFORE_EXPR);
+  
+  // Comment
+  def!(token LINE_COMMENT       <: COMMENT);
+  def!(token BLOCK_COMMENT      <: COMMENT);
+  def!(token HASHBANG           <: COMMENT);
+
+  // Scope Wrapping
+  def!(token PARENTHESIS_L  := "("    <: BEFORE_EXPR);
+  def!(token PARENTHESIS_R  := ")");
+  def!(token BRACKET_L      := "["    <: BEFORE_EXPR);
+  def!(token BRACKET_R      := "]");
+  def!(token BRACE_L        := "{"    <: BEFORE_EXPR);
+  def!(token BRACE_R        := "}");
+
+  // Values
+  def!(token IDENTIFIER);
+  def!(token REGEX_LITERAL        <: LITERAL);
+  def!(token STRING_LITERAL       <: LITERAL);
+  def!(token NUMERIC_LITERAL      <: LITERAL);
+  def!(token BOOLEAN_LITERAL      <: LITERAL);
+  def!(token TPL_STRING);
+  def!(token TPL_STRING_L         <: BEFORE_EXPR);
+  def!(token TPL_STRING_R);
+  def!(token TPL_STRING_RL        <: BEFORE_EXPR);
+
+  // Operation
+  def!(token ARROW               = =>     <: BEFORE_EXPR);
+  def!(token QUESTION            = ?      <: BEFORE_EXPR);
+  def!(token DOT                 = .      <: BEFORE_EXPR);
+  def!(token QUESTION_DOT       := ".?"   <: BEFORE_EXPR);
+  def!(token ELIPSIS             = ...    <: BEFORE_EXPR);
+  def!(token HASH                = #);
+  def!(token AT                  = @);
+  def!(token OP_PLUS             = +      <: OPERATOR | BEFORE_EXPR);
+  def!(token OP_INCRE           := "++"   <: OPERATOR);
+  def!(token OP_MINUS            = -      <: OPERATOR | BEFORE_EXPR);
+  def!(token OP_DECRE           := "--"   <: OPERATOR);
+  def!(token OP_STAR             = *      <: OPERATOR | BEFORE_EXPR);
+  def!(token OP_POW             := "**"   <: OPERATOR | BEFORE_EXPR);
+  def!(token OP_DIVIDE           = /      <: OPERATOR | BEFORE_EXPR);
+  def!(token OP_MOD              = /      <: OPERATOR | BEFORE_EXPR);
+  def!(token OP_BIT_AND          = &      <: OPERATOR | BEFORE_EXPR);
+  def!(token OP_AND              = &&     <: OPERATOR | BEFORE_EXPR);
+  def!(token OP_BIT_OR           = |      <: OPERATOR | BEFORE_EXPR);
+  def!(token OP_OR               = ||     <: OPERATOR | BEFORE_EXPR);
+  def!(token OP_BIT_XOR          = ^      <: OPERATOR | BEFORE_EXPR);
+  def!(token OP_BIT_INVERT       = ~      <: OPERATOR | BEFORE_EXPR);
+  def!(token OP_EXCLAIM          = !      <: OPERATOR | BEFORE_EXPR);
+  def!(token OP_LT               = <      <: OPERATOR | BEFORE_EXPR);
+  def!(token OP_ELT              = <=     <: OPERATOR | BEFORE_EXPR);
+  def!(token OP_GT               = >      <: OPERATOR | BEFORE_EXPR);
+  def!(token OP_EGT              = >=     <: OPERATOR | BEFORE_EXPR);
+  def!(token OP_BIT_LEFT         = <<     <: OPERATOR | BEFORE_EXPR);
+  def!(token OP_BIT_RIGHT        = >>     <: OPERATOR | BEFORE_EXPR);
+  def!(token OP_BIT_URIGHT      := ">>>"  <: OPERATOR | BEFORE_EXPR);
+  def!(token OP_EQUAL            = ==     <: OPERATOR | BEFORE_EXPR);
+  def!(token OP_EQUAL_STRICT    := "==="  <: OPERATOR | BEFORE_EXPR);
+  def!(token OP_NOT_EQUAL        = !=     <: OPERATOR | BEFORE_EXPR);
+  def!(token OP_ASSIGN           = =      <: OPERATOR | ASSIGN_OPERATOR | BEFORE_EXPR);
+  def!(token OP_INCRE_ASSIGN     = +=     <: OPERATOR | ASSIGN_OPERATOR | BEFORE_EXPR);
+  def!(token OP_DECRE_ASSIGN     = -=     <: OPERATOR | ASSIGN_OPERATOR | BEFORE_EXPR);
+  def!(token OP_MULTIPLY_ASSIGN  = *=     <: OPERATOR | ASSIGN_OPERATOR | BEFORE_EXPR);
+  def!(token OP_DIVIDE_ASSIGN    = /=     <: OPERATOR | ASSIGN_OPERATOR | BEFORE_EXPR);
+  def!(token OP_BIT_AND_ASSIGN   = &=     <: OPERATOR | ASSIGN_OPERATOR | BEFORE_EXPR);
+  def!(token OP_BIT_OR_ASSIGN    = |=     <: OPERATOR | ASSIGN_OPERATOR | BEFORE_EXPR);
+
 }
 
