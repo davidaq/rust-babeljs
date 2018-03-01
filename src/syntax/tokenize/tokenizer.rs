@@ -79,15 +79,7 @@ impl<'a> Tokenizer<'a> {
         match $rule::try(self) {
           None => (),
           Some (result) => {
-            // match tt::stringify(result.0) {
-            //   Some (s) => println!("{}", s),
-            //   None => {
-            //     println!("*vary* '{}'", content);
-            //   },
-            // }
             let end = start + result.1;
-            // let content = &(self.context.source).get(start..end).unwrap();
-            self.cursor = end;
             let token = tt::Token {
               token_type: result.0,
               context: self.context as *const Context,
@@ -95,7 +87,7 @@ impl<'a> Tokenizer<'a> {
               end: end,
             };
             self.context.append_token(token);
-            println!("T: {}", self.context.tokens[0].content());
+            self.cursor = end;
             return true;
           }
         }
