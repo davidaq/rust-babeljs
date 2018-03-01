@@ -3,9 +3,26 @@ pub use self::token::*;
 
 mod context;
 
+
 pub mod tt {
+  use syntax::context::Context;
+
   pub type Flag = usize;
   pub type TokenType = usize;
+  pub struct Token {
+    pub token_type : TokenType,
+    pub context : *const Context,
+    pub start : usize,
+    pub end : usize,
+  }
+
+  impl Token {
+    pub fn content (&self) -> &str {
+      unsafe {
+        self.context.as_ref().unwrap().source.get(self.start..self.end).unwrap()
+      }
+    }
+  }
 
   include!(concat!(env!("OUT_DIR"), "/token_type.rs"));
 

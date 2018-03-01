@@ -1,9 +1,5 @@
 use syntax::basic_types::SourceLoc;
 
-pub struct Token2<'a> {
-  pub content: &'a str,
-}
-
 pub struct Token {
   pub token_type: u16,
   pub loc: SourceLoc,

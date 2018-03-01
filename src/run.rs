@@ -13,7 +13,7 @@ pub fn main () {
   match env::args().nth(1) {
     Some (mode) => match &mode as &str {
       "debug" => {
-        context.append_source("    `42`");
+        context.append_source("      \t\t   +`42`");
       },
       _ => {
         let filename = &mode;

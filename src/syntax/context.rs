@@ -1,11 +1,11 @@
-use syntax::tokenize::{ Token2 };
+use syntax::tokenize::tt;
 
-pub struct Context<'a> {
+pub struct Context {
   pub source: String,
-  pub tokens: Vec<Box<Token2<'a> >>,
+  pub tokens: Vec<tt::Token>,
 }
 
-impl<'a> Context<'a> {
+impl Context {
   pub fn new () -> Self {
     Context {
       source: String::new(),
@@ -15,6 +15,14 @@ impl<'a> Context<'a> {
 
   pub fn append_source (&mut self, code: &str) {
     self.source += code;
+  }
+
+  pub fn append_token (&mut self, token: tt::Token) {
+    self.tokens.push(token);
+  }
+
+  pub fn token_content (&self, token: &tt::Token) -> &str {
+    return self.source.get(token.start..token.end).unwrap();
   }
 }
 

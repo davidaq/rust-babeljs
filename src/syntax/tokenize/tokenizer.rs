@@ -20,8 +20,8 @@ impl State {
 
 pub struct Tokenizer<'a> {
   state: State,
-  context: &'a Context<'a>,
-  source_chars: Chars<'a>,
+  context: &'a mut Context,
+  source_chars: Vec<char>,
   buffer: Vec<char>,
   head: usize,
   cursor: usize,
@@ -40,10 +40,11 @@ pub struct Tokenizer<'a> {
 impl<'a> Tokenizer<'a> {
 
   pub fn tokenize (ctx: &mut Context) {
+    let source_chars = ctx.source.chars().collect();
     let mut inst = Tokenizer {
       state: State::new(),
       context: ctx,
-      source_chars: ctx.source.chars(),
+      source_chars: source_chars,
       buffer: vec![],
       head: 0,
       cursor: 0,
@@ -61,41 +62,47 @@ impl<'a> Tokenizer<'a> {
     inst.run()
   }
 
-  fn commit (&mut self, len: usize) {
-    
-  }
-  
-  fn reset (&mut self) {
-  }
-
   pub fn next (&mut self) -> char {
-    match self.source_chars.nth(self.cursor) {
-      Some (c) => {
-        self.cursor += 1;
-        c
-      },
-      None => '\0',
+    if self.cursor >= self.source_chars.len() {
+      return '\0';
+    } else {
+      let c = self.source_chars[self.cursor];
+      self.cursor += 1;
+      return c;
     }
   }
 
-  fn try_rules (&mut self) {
+  fn try_rules (&mut self, start: usize) -> bool {
     macro_rules! match_token_rule {
       ( $rule:ident ) => {
+        self.cursor = start;
         match $rule::try(self) {
-          None => self.reset(),
+          None => (),
           Some (result) => {
-            match tt::stringify(result.0) {
-              Some (s) => println!("{}", s),
-              None => {
-                println!("*vary* {}", result.1);
-              },
-            }
-            return
+            // match tt::stringify(result.0) {
+            //   Some (s) => println!("{}", s),
+            //   None => {
+            //     println!("*vary* '{}'", content);
+            //   },
+            // }
+            let end = start + result.1;
+            // let content = &(self.context.source).get(start..end).unwrap();
+            self.cursor = end;
+            let token = tt::Token {
+              token_type: result.0,
+              context: self.context as *const Context,
+              start: start,
+              end: end,
+            };
+            self.context.append_token(token);
+            println!("T: {}", self.context.tokens[0].content());
+            return true;
           }
         }
       }
     }
     match_token_rule!(rule_whitespace);
+    return false;
   }
 
   fn run (&mut self) {
@@ -104,9 +111,9 @@ impl<'a> Tokenizer<'a> {
     while !self.ended {
       let mut token_type = tt::UNEXPECTED;
       let start = self.cursor;
-      self.try_rules();
-      println!("ATEMPT");
-      break
+      if self.try_rules(start) {
+        break;
+      }
       // let mut content = Option::None;
       // let start = self.context.pos();
 
