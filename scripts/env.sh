@@ -2,7 +2,7 @@ RUSTFLAGS="-A dead_code"
 PROJECT_ROOT=$(cd `dirname $0`/..; pwd)
 
 # Will use docker to run the script if rustc is not detected
-DOCKER_IMAGE=newretail.alpha.elenet.me:5000/rust-wasm
+DOCKER_IMAGE=docker.io/tomaka/rustc-emscripten
 
 RUSTC_EXISTS=`which rustc`
 if [ -z "$RUSTC_EXISTS" -a -z "$NO_DOCKER" ]; then
