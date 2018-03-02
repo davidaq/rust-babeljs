@@ -20,9 +20,5 @@ impl Context {
   pub fn append_token (&mut self, token: tt::Token) {
     self.tokens.push(token);
   }
-
-  pub fn token_content (&self, token: &tt::Token) -> &str {
-    return self.source.get(token.start..token.end).unwrap();
-  }
 }
 

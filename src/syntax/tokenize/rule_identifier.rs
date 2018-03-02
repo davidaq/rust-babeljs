@@ -1,7 +1,7 @@
-use syntax::tokenize::token_type;
-use syntax::tokenize::context::Context;
+use syntax::tokenize::tt;
+use syntax::tokenize::Tokenizer;
 
-pub fn all (context: &mut Context) -> Option<( u16, u32, usize )> {
+pub fn try (context: &mut Tokenizer) -> Option<( tt::TokenType, usize )> {
   let mut len = 0;
   loop {
     let c = context.next();
@@ -36,57 +36,55 @@ pub fn all (context: &mut Context) -> Option<( u16, u32, usize )> {
     };
   }
   if len > 0 {
-    let (token_type, flag) = match context.content(len) {
-      "true"      => (token_type::BOOLEAN_LITERAL, token_type::boolean::TRUE),
-      "false"     => (token_type::BOOLEAN_LITERAL, token_type::boolean::FALSE),
-
-      "function"  => (token_type::FUNCTION, 0),
-      "return"    => (token_type::RETURN, 0),
-      "async"     => (token_type::ASYNC, 0),
-      "await"     => (token_type::AWAIT, 0),
-      "throw"     => (token_type::THROW, 0),
-      "yield"     => (token_type::YIELD, 0),
-      "class"     => (token_type::CLASS, 0),
-      "extends"   => (token_type::EXTENDS, 0),
-      "static"    => (token_type::STATIC, 0),
-      "if"        => (token_type::IF, 0),
-      "else"      => (token_type::ELSE, 0),
-      "switch"    => (token_type::SWITCH, 0),
-      "case"      => (token_type::CASE, 0),
-      "while"     => (token_type::WHILE, 0),
-      "for"       => (token_type::FOR, 0),
-      "break"     => (token_type::BREAK, 0),
-      "continue"  => (token_type::CONTINUE, 0),
-      "do"        => (token_type::DO, 0),
-      "with"      => (token_type::WITH, 0),
-      "var"       => (token_type::VAR, 0),
-      "let"       => (token_type::LET, 0),
-      "void"      => (token_type::VOID, 0),
-      "delete"    => (token_type::DELETE, 0),
-      "const"     => (token_type::CONST, 0),
-      "typeof"    => (token_type::TYPEOF, 0),
-      "new"       => (token_type::NEW, 0),
+    let token_type = match context.get_source_from_cursor(len) {
+      "true" | "false"      => tt::BOOLEAN_LITERAL,
+      "function"  => tt::FUNCTION,
+      "return"    => tt::RETURN,
+      "async"     => tt::ASYNC,
+      "await"     => tt::AWAIT,
+      "throw"     => tt::THROW,
+      "yield"     => tt::YIELD,
+      "class"     => tt::CLASS,
+      "extends"   => tt::EXTENDS,
+      "static"    => tt::STATIC,
+      "if"        => tt::IF,
+      "else"      => tt::ELSE,
+      "switch"    => tt::SWITCH,
+      "case"      => tt::CASE,
+      "while"     => tt::WHILE,
+      "for"       => tt::FOR,
+      "break"     => tt::BREAK,
+      "continue"  => tt::CONTINUE,
+      "do"        => tt::DO,
+      "with"      => tt::WITH,
+      "var"       => tt::VAR,
+      "let"       => tt::LET,
+      "void"      => tt::VOID,
+      "delete"    => tt::DELETE,
+      "const"     => tt::CONST,
+      "typeof"    => tt::TYPEOF,
+      "new"       => tt::NEW,
       
-      "import"    => (token_type::IMPORT, 0),
-      "from"      => (token_type::FROM, 0),
-      "export"    => (token_type::EXPORT, 0),
-      "default"   => (token_type::DEFAULT, 0),
-      "try"       => (token_type::TRY, 0),
-      "catch"     => (token_type::CATCH, 0),
+      "import"    => tt::IMPORT,
+      "from"      => tt::FROM,
+      "export"    => tt::EXPORT,
+      "default"   => tt::DEFAULT,
+      "try"       => tt::TRY,
+      "catch"     => tt::CATCH,
 
-      "in"          => (token_type::IN, 0),
-      "of"          => (token_type::OF, 0),
-      "instanceof"  => (token_type::INSTANCEOF, 0),
+      "in"          => tt::IN,
+      "of"          => tt::OF,
+      "instanceof"  => tt::INSTANCEOF,
 
-      _           => (token_type::IDENTIFIER, 0),
+      _           => tt::IDENTIFIER,
     };
-    return Option::Some(( token_type, flag, len ))
+    return Option::Some(( token_type, len ));
   } else {
-    return Option::None
+    return Option::None;
   }
 }
 
-fn match_unicode_expr (context: &mut Context) -> usize {
+fn match_unicode_expr (context: &mut Tokenizer) -> usize {
   match context.next() {
     'u' => {
       match context.next() {
@@ -124,3 +122,4 @@ fn match_unicode_expr (context: &mut Context) -> usize {
     _ => return 0,
   }
 }
+

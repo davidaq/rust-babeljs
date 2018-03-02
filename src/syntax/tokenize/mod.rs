@@ -33,6 +33,10 @@ pub mod tt {
   pub fn type_is (ty: TokenType, flag: Flag) -> bool {
     TOK_FLAG[ty] & flag != 0
   }
+
+  pub fn name_of (ty: TokenType) -> &'static str {
+    TOK_NAME[ty]
+  }
 }
 
 mod tokenizer;

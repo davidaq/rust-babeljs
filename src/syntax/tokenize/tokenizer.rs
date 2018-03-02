@@ -72,12 +72,14 @@ impl<'a> Tokenizer<'a> {
     }
   }
 
-  fn try_rules (&mut self, start: usize) -> bool {
+  fn try_rules (&mut self) -> bool {
+    let start = self.cursor;
     macro_rules! match_token_rule {
       ( $rule:ident ) => {
-        self.cursor = start;
         match $rule::try(self) {
-          None => (),
+          None => {
+            self.cursor = start;
+          },
           Some (result) => {
             let end = start + result.1;
             let token = tt::Token {
@@ -94,7 +96,13 @@ impl<'a> Tokenizer<'a> {
       }
     }
     match_token_rule!(rule_whitespace);
+    match_token_rule!(rule_identifier);
     return false;
+  }
+
+  pub fn get_source_from_cursor (&self, len: usize) -> &str {
+    let end = self.cursor + len;
+    return self.context.source.get(self.cursor..end).unwrap();
   }
 
   fn run (&mut self) {
@@ -102,8 +110,7 @@ impl<'a> Tokenizer<'a> {
 
     while !self.ended {
       let mut token_type = tt::UNEXPECTED;
-      let start = self.cursor;
-      if self.try_rules(start) {
+      if !self.try_rules() {
         break;
       }
       // let mut content = Option::None;

@@ -16,6 +16,7 @@ fn gen_token_type () {
   
   let mut content_mapping = String::new();
   let mut flag_mapping = String::new();
+  let mut name_mapping = String::new();
 
   macro_rules! def {
     (flag $name:ident) => {
@@ -48,6 +49,10 @@ fn gen_token_type () {
             _ => (),
           }
         )*
+        name_mapping += &format!(
+          ", {}",
+          stringify!(stringify!($name))
+        );
         flag_mapping += &format!(
           ", {}",
           flag_val
@@ -86,6 +91,13 @@ fn gen_token_type () {
     "const TOK_STRING : [Option<&'static str>;{}] = [Option::None {}];\n",
     type_count,
     &content_mapping
+  ).unwrap();
+
+  write!(
+    f,
+    "const TOK_NAME : [&'static str;{}] = [\"\" {}];\n",
+    type_count,
+    &name_mapping
   ).unwrap();
 
   write!(

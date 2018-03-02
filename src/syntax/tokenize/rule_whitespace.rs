@@ -10,7 +10,6 @@ pub fn try (context: &mut Tokenizer) -> Option<( tt::TokenType, usize )> {
         len += 1;
       },
       _ => {
-        println!("break {}", c);
         break;
       },
     };

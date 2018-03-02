@@ -13,7 +13,7 @@ pub fn main () {
   match env::args().nth(1) {
     Some (mode) => match &mode as &str {
       "debug" => {
-        context.append_source("      \t\t   +`42`");
+        context.append_source("    var a=  true;\t\t   +`42`");
       },
       _ => {
         let filename = &mode;
@@ -40,6 +40,11 @@ pub fn main () {
     },
   }
   Tokenizer::tokenize(&mut context);
+
+  for i in 0..context.tokens.len() {
+    let token = &context.tokens[i];
+    println!("{} \t: '{}'", tt::name_of(token.token_type), token.content());
+  }
   
   //Tokenizer::new(&source_queue, &token_queue).run();
 

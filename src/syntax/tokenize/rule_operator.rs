@@ -1,33 +1,33 @@
-use syntax::tokenize::token_type;
-use syntax::tokenize::context::Context;
+use syntax::tokenize::tt;
+use syntax::tokenize::Tokenizer;
 
-pub fn all (context: &mut Context) -> Option<( u16, u32, usize )> {
+pub fn all (context: &mut Tokenizer) -> Option<( tt::TokenType, usize )> {
   match context.next() {
-    ':' => Option::Some(( token_type::COLON, 0, 1 )),
-    ';' => Option::Some(( token_type::SEMI_COLON, 0, 1 )),
-    ',' => Option::Some(( token_type::COMMA, 0, 1 )),
-    '(' => Option::Some(( token_type::PARENTHESIS_L, 0, 1 )),
-    ')' => Option::Some(( token_type::PARENTHESIS_R, 0, 1 )),
-    '[' => Option::Some(( token_type::BRACKET_L, 0, 1 )),
-    ']' => Option::Some(( token_type::BRACKET_R, 0, 1 )),
+    ':' => Option::Some(( tt::COLON, 1 )),
+    ';' => Option::Some(( tt::SEMI_COLON, 1 )),
+    ',' => Option::Some(( tt::COMMA, 1 )),
+    '(' => Option::Some(( tt::PARENTHESIS_L, 1 )),
+    ')' => Option::Some(( tt::PARENTHESIS_R, 1 )),
+    '[' => Option::Some(( tt::BRACKET_L, 1 )),
+    ']' => Option::Some(( tt::BRACKET_R, 1 )),
     '{' => {
       context.state.brace_stack.push(false);
-      Option::Some(( token_type::BRACE_L, 0, 1 ))
+      Option::Some(( tt::BRACE_L, 1 ))
     },
     '}' => {
       context.state.brace_stack.pop();
-      Option::Some(( token_type::BRACE_R, 0, 1 ))
+      Option::Some(( tt::BRACE_R, 1 ))
     },
     '?' => match context.next() {
-      '.' => Option::Some(( token_type::QUESTION_DOT, 0, 2 )),
-      _ => Option::Some(( token_type::QUESTION, 0, 1 )),
+      '.' => Option::Some(( token_type::QUESTION_DOT, 2 )),
+      _ => Option::Some(( token_type::QUESTION, 1 )),
     },
     '.' => match context.next() {
       '.' => match context.next() {
-        '.' => Option::Some(( token_type::ELIPSIS, 0, 3 )),
-        _ => Option::Some(( token_type::DOT, 0, 1 )),
+        '.' => Option::Some(( token_type::ELIPSIS, 3 )),
+        _ => Option::Some(( token_type::DOT, 1 )),
       },
-      _ => Option::Some(( token_type::DOT, 0, 1 )),
+      _ => Option::Some(( token_type::DOT, 1 )),
     },
     '%' => Option::Some(( token_type::OPERATOR, token_type::operator::MOD, 1 )),
     '^' => Option::Some(( token_type::OPERATOR, token_type::operator::XOR, 1 )),
