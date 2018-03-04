@@ -4,7 +4,7 @@ use syntax::basic_types::{ SourceLoc };
 use syntax::tokenize::*;
 use syntax::context::Context;
 
-struct State {
+pub struct State {
   pub expr_allowed: bool,
   pub brace_stack: Vec<bool>,
 }
@@ -19,22 +19,14 @@ impl State {
 }
 
 pub struct Tokenizer<'a> {
-  state: State,
+  pub state: State,
   context: &'a mut Context,
   source_chars: Vec<char>,
   buffer: Vec<char>,
   head: usize,
   cursor: usize,
   ended: bool,
-  line: usize,
-  col: usize,
-  commit: usize,
-
-  tmp_commit: usize,
-  tmp_len: usize,
-  tmp_line: usize,
-  tmp_col: usize,
-  tmp_content: String,
+  allow_hashbang: bool,
 }
 
 impl<'a> Tokenizer<'a> {
@@ -49,15 +41,7 @@ impl<'a> Tokenizer<'a> {
       head: 0,
       cursor: 0,
       ended: false,
-      line: 1,
-      col: 0,
-      commit: 0,
-
-      tmp_commit: 0,
-      tmp_len: 0,
-      tmp_line: 1,
-      tmp_col: 1,
-      tmp_content: String::with_capacity(100),
+      allow_hashbang: true
     };
     inst.run()
   }
@@ -72,6 +56,10 @@ impl<'a> Tokenizer<'a> {
     }
   }
 
+  pub fn allow_hashbang (&self) -> bool {
+    return self.allow_hashbang
+  }
+
   fn try_rules (&mut self) -> bool {
     let start = self.cursor;
     macro_rules! match_token_rule {
@@ -81,6 +69,9 @@ impl<'a> Tokenizer<'a> {
             self.cursor = start;
           },
           Some (result) => {
+	    if result.0 != tt::WHITE_SPACE {
+	      self.allow_hashbang = false;
+	    }
             let end = start + result.1;
             let token = tt::Token {
               token_type: result.0,
@@ -90,13 +81,18 @@ impl<'a> Tokenizer<'a> {
             };
             self.context.append_token(token);
             self.cursor = end;
+	    if end >= self.source_chars.len() {
+	    	self.ended = true;
+	    }
             return true;
           }
         }
       }
     }
     match_token_rule!(rule_whitespace);
+    match_token_rule!(rule_comment);
     match_token_rule!(rule_identifier);
+    match_token_rule!(rule_operator);
     return false;
   }
 

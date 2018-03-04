@@ -1,7 +1,7 @@
-use syntax::tokenize::token_type;
-use syntax::tokenize::context::Context;
+use syntax::tokenize::tt;
+use syntax::tokenize::Tokenizer;
 
-pub fn all (context: &mut Context) -> Option<( u16, u32, usize )> {
+pub fn try (context: &mut Tokenizer) -> Option<( tt::TokenType, usize )> {
   match context.next() {
     '/' => {
       match context.next() {
@@ -13,7 +13,7 @@ pub fn all (context: &mut Context) -> Option<( u16, u32, usize )> {
               _ => len += 1,
             }
           }
-          Option::Some((token_type::COMMENT, token_type::comment::LINE, len))
+          Option::Some((tt::LINE_COMMENT, len))
         },
         '*' => {
           let mut len = 2;
@@ -34,7 +34,7 @@ pub fn all (context: &mut Context) -> Option<( u16, u32, usize )> {
               _ => len += 1,
             }
           }
-          Option::Some((token_type::COMMENT, token_type::comment::BLOCK, len))
+          Option::Some((tt::BLOCK_COMMENT, len))
         },
         _ => Option::None,
       }
@@ -48,7 +48,7 @@ pub fn all (context: &mut Context) -> Option<( u16, u32, usize )> {
             _ => len += 1,
           }
         }
-        Option::Some((token_type::COMMENT, token_type::comment::HASHBANG, len))
+        Option::Some((tt::HASHBANG, len))
       } else {
         Option::None
       }

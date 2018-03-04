@@ -13,7 +13,11 @@ pub fn main () {
   match env::args().nth(1) {
     Some (mode) => match &mode as &str {
       "debug" => {
-        context.append_source("    var a=  true;\t\t   +`42`");
+        context.append_source("#!/bin/bash\n");
+        context.append_source("//Hello\n");
+        context.append_source("#!/bin/bash\n");
+        context.append_source("/*Hello*/console.log\n");
+        context.append_source("    var a=  true;\t\t   +`42`\n");
       },
       _ => {
         let filename = &mode;
