@@ -43,7 +43,9 @@ pub fn main () {
       process::exit(1);
     },
   }
-  Tokenizer::tokenize(&mut context);
+  if !Tokenizer::tokenize(&mut context) {
+    panic!("Tokenize fail");
+  }
 
   for i in 0..context.tokens.len() {
     let token = &context.tokens[i];

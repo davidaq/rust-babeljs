@@ -31,7 +31,7 @@ pub struct Tokenizer<'a> {
 
 impl<'a> Tokenizer<'a> {
 
-  pub fn tokenize (ctx: &mut Context) {
+  pub fn tokenize (ctx: &mut Context) -> bool {
     let source_chars = ctx.source.chars().collect();
     let mut inst = Tokenizer {
       state: State::new(),
@@ -101,13 +101,13 @@ impl<'a> Tokenizer<'a> {
     return self.context.source.get(self.cursor..end).unwrap();
   }
 
-  fn run (&mut self) {
+  fn run (&mut self) -> bool {
     let mut prev_type = tt::UNEXPECTED;
 
     while !self.ended {
       let mut token_type = tt::UNEXPECTED;
       if !self.try_rules() {
-        break;
+        return false;
       }
       // let mut content = Option::None;
       // let start = self.context.pos();
@@ -164,6 +164,7 @@ impl<'a> Tokenizer<'a> {
   //      prev_type = token_type;
   //    }
     }
+    return true;
   }
 }
 
